@@ -1,0 +1,4 @@
+.slide-wrapper{position: relative;overflow: hidden;}
+.slide-horizontal{position: relative;left: 0;}
+.slide-horizontal li{float: left;}
+.slide-vertical{position: relative;top: 0;}
