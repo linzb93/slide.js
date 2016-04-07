@@ -59,6 +59,12 @@ function Slider(node, config){
 				}
 			}, _that.autoPlay);
 		}
+		if(this.pageClickable){
+			_that.pagination.find('span').on('click', function(){
+				var dotIndex = this.index();
+				_that.slideTo(dotIndex);
+			})
+		}
 	}
 
 	var _returnInit = function(){
@@ -87,7 +93,15 @@ function Slider(node, config){
 		}
 	};
 
-	this.slideTo = function(num){}
+	this.slideTo = function(num){
+		var _delta = num - _that.index;
+		if(_that.mode === 'horizontal'){
+			_that.list.animate({left: '+=' + _delta * _that.liWidth + 'px'}, _that.speed);
+		}
+		else if(_that.mode === 'vertical'){
+			_that.list.animate({top: '+=' + _delta * _that.liHeight + 'px'}, _that.speed);
+		}
+	}
 
 	var _slideAnimation = function(num){
 		if(_that.mode === 'horizontal'){
