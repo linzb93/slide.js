@@ -1,7 +1,10 @@
-# Readme
+# jQuery-slide.js
 我写这个插件，有两个目的，一是想熟悉下Javascript的面向对象，为了将来可以自己写插件和读懂jQuery源码；二是厌倦了Swiper莫名其妙的bug，而且实际用到的功能也就一点点，还不如自己写一个轻量的jQuery插件。
+
 这个插件的API和Swiper是一样的，如果你使用过Swiper那再好不过了。如果你没有使用过Swiper，那我这里简单讲下API的使用方法。
+
 首先引入两个文件：slide.css和jquery-slide.js（默认已经引入jquery），其中slide.css可以引入你的css文件中并修改，修改方式在slide.css中已经有注释了。
+
 以下内容，使用过Swiper的用户可以跳过。
 
 ---
@@ -25,4 +28,5 @@ mySlide.slideNext();
 ```
 ---
 其他API会在API和demo里面展现，这里不再重复。
+
 插件目前还有部分bug，在推出V1.0之前还不能使用。
