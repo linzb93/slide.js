@@ -1,5 +1,6 @@
 /*-----虚线内部的类名可以修改-----*/
 .slide-wrapper{position: relative;overflow: hidden;}
+.page span{cursor: pointer;}
 /*-----虚线内部的类名可以修改-----*/
 
 /*-----以下内容可以直接拷进样式表中-----*/
