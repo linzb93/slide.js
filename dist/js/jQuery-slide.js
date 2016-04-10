@@ -41,7 +41,6 @@ function Slider(node, config){
 	}
 
 	var _init = function(){
-
 		if(_that.canShowPagination){
 			for(var i = 0; i< _that.length; i++){
 				_that.pagination.append('<span></span>');
@@ -75,6 +74,7 @@ function Slider(node, config){
 		else if(_that.mode === 'vertical'){
 			_that.list.animate({top: '0px'}, _that.speed);
 		}
+		this.page.find('span').eq(0).addClass('on');
 	};
 
 	this.slidePrev = function(){
@@ -90,6 +90,9 @@ function Slider(node, config){
 			clearInterval(_that.timer);
 			_that.index ++;
 			_slideAnimation(-_that.slidePerView);
+		}
+		else{
+			_returnInit();
 		}
 	};
 
