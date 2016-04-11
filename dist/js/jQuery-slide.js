@@ -48,28 +48,17 @@ function Slider(node, config){
 		}
 		if(_that.autoPlay){
 			_that.timer = setInterval(function(){
-				if(_that.slideIndex < _that.slideLength - 1){
-					_that.slideIndex ++;
-					_slideAnimation(-_that.slidePerView);
-				}
-				else if(_that.slideIndex === _that.slideLength - 1){
-					_that.slideTo(0);
-				}
+				_that.slideNext(true);
 			}, _that.autoPlay);
 		}
 		if(_that.pageClickable){
-			_that.pagination.find('span').on('click', function(){
-
-				var dotIndex = $(this).index();
-				console.log(dotIndex);
-				_that.slideTo(dotIndex);
-			})
+			_pageBind();
 		}
 	}
 
 	this.slidePrev = function(){
+		clearInterval(this.timer);
 		if(this.slideIndex > 0){
-			clearInterval(this.timer);
 			this.slideIndex --;
 			_slideAnimation(this.slidePerView);
 		}
@@ -78,19 +67,23 @@ function Slider(node, config){
 		}
 	};
 
-	this.slideNext = function(){
-		if(this.slideIndex < this.slideLength - 1){
+	this.slideNext = function(notClear){
+		if(!notClear){
 			clearInterval(this.timer);
-			this.slideIndex ++;
-			_slideAnimation(-this.slidePerView);
+		}
+		if(_that.slideIndex < _that.slideLength - 1){
+			_that.slideIndex ++;
+			_slideAnimation(-_that.slidePerView);
 		}
 		else{
-			this.slideTo(0);
+			_that.slideTo(0, notClear);
 		}
 	};
 
-	this.slideTo = function(num){
-		clearInterval(this.timer);
+	this.slideTo = function(num, notClear){
+		if(!notClear){
+			clearInterval(this.timer);
+		}
 		var _delta = num - this.slideIndex;
 		if(this.mode === 'horizontal'){
 			this.list.animate({left: '-=' + _delta * _that.liWidth + 'px'}, _that.speed);
@@ -100,6 +93,10 @@ function Slider(node, config){
 		}
 		this.slideIndex = num;
 		_paginationChange();
+	}
+
+	var _slideToNext = function(){
+		
 	}
 
 	var _slideAnimation = function(num){
@@ -116,6 +113,13 @@ function Slider(node, config){
 
 	var _paginationChange = function(){
 		_that.pagination.find('span').eq(_that.slideIndex).addClass('on').siblings().removeClass('on');
+	}
+
+	var _pageBind = function(){
+		_that.pagination.find('span').on('click', function(){
+				var dotIndex = $(this).index();
+				_that.slideTo(dotIndex);
+			});
 	}
 
 	_init();
