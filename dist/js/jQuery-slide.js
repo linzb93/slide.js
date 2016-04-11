@@ -68,37 +68,37 @@ function Slider(node, config){
 	}
 
 	this.slidePrev = function(){
-		if(_that.slideIndex > 0){
-			clearInterval(_that.timer);
-			_that.slideIndex --;
-			_slideAnimation(_that.slidePerView);
+		if(this.slideIndex > 0){
+			clearInterval(this.timer);
+			this.slideIndex --;
+			_slideAnimation(this.slidePerView);
 		}
 		else{
-			_that.slideTo(_that.slideLength - 1);
+			this.slideTo(this.slideLength - 1);
 		}
 	};
 
 	this.slideNext = function(){
-		if(_that.slideIndex < _that.slideLength - 1){
-			clearInterval(_that.timer);
-			_that.slideIndex ++;
-			_slideAnimation(-_that.slidePerView);
+		if(this.slideIndex < this.slideLength - 1){
+			clearInterval(this.timer);
+			this.slideIndex ++;
+			_slideAnimation(-this.slidePerView);
 		}
 		else{
-			_that.slideTo(0);
+			this.slideTo(0);
 		}
 	};
 
 	this.slideTo = function(num){
-		clearInterval(_that.timer);
-		var _delta = num - _that.slideIndex;
-		if(_that.mode === 'horizontal'){
-			_that.list.animate({left: '-=' + _delta * _that.liWidth + 'px'}, _that.speed);
+		clearInterval(this.timer);
+		var _delta = num - this.slideIndex;
+		if(this.mode === 'horizontal'){
+			this.list.animate({left: '-=' + _delta * _that.liWidth + 'px'}, _that.speed);
 		}
-		else if(_that.mode === 'vertical'){
-			_that.list.animate({top: '-=' + _delta * _that.liHeight + 'px'}, _that.speed);
+		else if(this.mode === 'vertical'){
+			this.list.animate({top: '-=' + _delta * _that.liHeight + 'px'}, _that.speed);
 		}
-		_that.slideIndex = num;
+		this.slideIndex = num;
 		_paginationChange();
 	}
 
