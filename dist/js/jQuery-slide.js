@@ -21,7 +21,7 @@ function Slider(node, config){
 	this.list = this.block.find('ul'),
 	this.li = this.list.find('li'),
 	this.length = this.li.length,
-	this.slideLength = Math.ceil(this.length / this.slidePerView);
+	this.slideLength = Math.ceil((this.length - this.perGroup) / this.slidePerView) + 1;
 	this.liWidth = this.li.width(),
 	this.liHeight = this.li.height(),
 	this.slideIndex = 0,
@@ -85,18 +85,9 @@ function Slider(node, config){
 			clearInterval(this.timer);
 		}
 		var _delta = num - this.slideIndex;
-		if(this.mode === 'horizontal'){
-			this.list.animate({left: '-=' + _delta * _that.liWidth + 'px'}, _that.speed);
-		}
-		else if(this.mode === 'vertical'){
-			this.list.animate({top: '-=' + _delta * _that.liHeight + 'px'}, _that.speed);
-		}
+			_slideAnimation(-_delta * _that.slidePerView);
 		this.slideIndex = num;
 		_paginationChange();
-	}
-
-	var _slideToNext = function(){
-		
 	}
 
 	var _slideAnimation = function(num){
