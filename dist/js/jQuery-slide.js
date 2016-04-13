@@ -21,16 +21,17 @@ function Slider(node, config){
 	this.list = this.block.find('ul'),
 	this.li = this.list.find('li'),
 	this.length = this.li.length,
-	this.slideLength = Math.ceil(this.length / this.slidePerView);
+	this.slideLength = Math.ceil((this.length - this.perGroup) / this.slidePerView) + 1;
 	this.liWidth = this.li.width(),
 	this.liHeight = this.li.height(),
 	this.slideIndex = 0,
 	this.timer = null;
 	var _that = this;
 	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1;
+
 	var _init = function(){
+		//设定轮播样式
 		if(_that.mode === 'horizontal'){
-			console.log(this); 
 			_that.block.width(_that.liWidth * _that.perGroup);
 			_that.list.width(_that.liWidth * _that.length);
 			_that.list.addClass('slide-horizontal');
@@ -40,12 +41,14 @@ function Slider(node, config){
 			_that.list.height(_that.liHeight * _that.length);
 			_that.list.addClass('slide-vertical');
 		}
+		//添加翻页圆点
 		if(_that.canShowPagination){
 			for(var i = 0; i< _that.length; i++){
 				_that.pagination.append('<span></span>');
 			}
 			_that.pagination.find('span').eq(0).addClass('on');
 		}
+		//自动播放
 		if(_that.autoPlay){
 			_that.timer = setInterval(function(){
 				_that.slideNext(true);
@@ -85,14 +88,8 @@ function Slider(node, config){
 			clearInterval(this.timer);
 		}
 		var _delta = num - this.slideIndex;
-		if(this.mode === 'horizontal'){
-			this.list.animate({left: '-=' + _delta * _that.liWidth + 'px'}, _that.speed);
-		}
-		else if(this.mode === 'vertical'){
-			this.list.animate({top: '-=' + _delta * _that.liHeight + 'px'}, _that.speed);
-		}
+		_slideAnimation(-_delta * _that.slidePerView);
 		this.slideIndex = num;
-		_paginationChange();
 	}
 
 	var _slideAnimation = function(num){
@@ -113,9 +110,9 @@ function Slider(node, config){
 
 	var _pageBind = function(){
 		_that.pagination.find('span').on('click', function(){
-				var dotIndex = $(this).index();
-				_that.slideTo(dotIndex);
-			});
+			var dotIndex = $(this).index();
+			_that.slideTo(dotIndex);
+		});
 	}
 
 	_init();
