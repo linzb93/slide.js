@@ -28,9 +28,9 @@ function Slider(node, config){
 	this.timer = null;
 	var _that = this;
 	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1;
-
 	var _init = function(){
 		if(_that.mode === 'horizontal'){
+			console.log(this); 
 			_that.block.width(_that.liWidth * _that.perGroup);
 			_that.list.width(_that.liWidth * _that.length);
 			_that.list.addClass('slide-horizontal');
@@ -93,10 +93,6 @@ function Slider(node, config){
 		}
 		this.slideIndex = num;
 		_paginationChange();
-	}
-
-	var _slideToNext = function(){
-		
 	}
 
 	var _slideAnimation = function(num){
