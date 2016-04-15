@@ -1,13 +1,12 @@
 function Slider(node, config){
 	var defaultPara = {
-		mode: 'horizontal', //滚动方向
-		speed: 500, //滚动速度
-		perGroup: 1, //显示数量
-		slidePerView: 1, //每次滚动的数量
-		autoPlay: 0, //自动滚动的时间间隔，不大于0时关闭
-		loop: true, //是否循环播放
-		pagination: null, //分页器
-		pageClickable: true //分页器是否可点击
+		mode: 'horizontal',
+		speed: 500,
+		perGroup: 1,
+		slidePerView: 1,
+		autoPlay: 0,
+		pagination: null,
+		pageClickable: true
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -29,7 +28,8 @@ function Slider(node, config){
 	var _that = this;
 	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1;
 
-	var _init = function(){
+//初始化
+var _init = function(){
 		//设定轮播样式
 		if(_that.mode === 'horizontal'){
 			_that.block.width(_that.liWidth * _that.perGroup);
@@ -41,7 +41,7 @@ function Slider(node, config){
 			_that.list.height(_that.liHeight * _that.length);
 			_that.list.addClass('slide-vertical');
 		}
-		//添加翻页圆点
+		//添加分页器
 		if(_that.canShowPagination){
 			for(var i = 0; i< _that.length; i++){
 				_that.pagination.append('<span></span>');
@@ -88,32 +88,35 @@ function Slider(node, config){
 			clearInterval(this.timer);
 		}
 		var _delta = num - this.slideIndex;
-		_slideAnimation(-_delta * _that.slidePerView);
 		this.slideIndex = num;
+		_slideAnimation(-_delta * _that.slidePerView);
 	}
 
-	var _slideAnimation = function(num){
-		if(_that.mode === 'horizontal'){
-			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
-		}
-		else if(_that.mode === 'vertical'){
-			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-		}
-		if(_that.canShowPagination){
-			_paginationChange();
-		}
+//执行滚动
+var _slideAnimation = function(num){
+	if(_that.mode === 'horizontal'){
+		_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
 	}
-
-	var _paginationChange = function(){
-		_that.pagination.find('span').eq(_that.slideIndex).addClass('on').siblings().removeClass('on');
+	else if(_that.mode === 'vertical'){
+		_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
 	}
-
-	var _pageBind = function(){
-		_that.pagination.find('span').on('click', function(){
-			var dotIndex = $(this).index();
-			_that.slideTo(dotIndex);
-		});
+	if(_that.canShowPagination){
+		_paginationChange();
 	}
+}
 
-	_init();
+//分页器变换
+var _paginationChange = function(){
+	_that.pagination.find('span').eq(_that.slideIndex).addClass('on').siblings().removeClass('on');
+}
+
+//绑定分页器事件
+var _pageBind = function(){
+	_that.pagination.find('span').on('click', function(){
+		var dotIndex = $(this).index();
+		_that.slideTo(dotIndex);
+	});
+}
+
+_init();
 }
