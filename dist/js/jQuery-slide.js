@@ -1,13 +1,12 @@
 function Slider(node, config){
 	var defaultPara = {
-		mode: 'horizontal', //滚动方向
-		speed: 500, //滚动速度
-		perGroup: 1, //显示数量
-		slidePerView: 1, //每次滚动的数量
-		autoPlay: 0, //自动滚动的时间间隔，不大于0时关闭
-		loop: true, //是否循环播放
-		pagination: null, //分页器
-		pageClickable: true //分页器是否可点击
+		mode: 'horizontal',
+		speed: 500,
+		perGroup: 1,
+		slidePerView: 1,
+		autoPlay: 0,
+		pagination: null,
+		pageClickable: true
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -28,6 +27,7 @@ function Slider(node, config){
 	this.timer = null;
 	var _that = this;
 	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1;
+
 
 	var _init = function(){
 		//设定轮播样式
@@ -88,8 +88,8 @@ function Slider(node, config){
 			clearInterval(this.timer);
 		}
 		var _delta = num - this.slideIndex;
-		_slideAnimation(-_delta * _that.slidePerView);
 		this.slideIndex = num;
+		_slideAnimation(-_delta * _that.slidePerView);
 	}
 
 	var _slideAnimation = function(num){
