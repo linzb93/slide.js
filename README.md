@@ -27,6 +27,4 @@ mySlide.slideNext();
 });
 ```
 ---
-其他API会在API和demo里面展现，这里不再重复。
-
-插件目前还有部分bug，在推出V1.0之前还不能使用。
+其他API会在[API.md](https://github.com/linzb93/slide/blob/master/API.md)和demo里面展现，这里不再重复。
