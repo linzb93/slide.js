@@ -26,7 +26,7 @@ function Slider(node, config){
 	this.slideIndex = 0,
 	this.timer = null;
 	var _that = this;
-	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1;
+	this.canShowPagination = _that.pagination && _that.perGroup === 1 && _that.slidePerView === 1; //是否展示分页器
 
 //初始化
 var _init = function(){
@@ -44,9 +44,9 @@ var _init = function(){
 		//添加分页器
 		if(_that.canShowPagination){
 			for(var i = 0; i< _that.length; i++){
-				_that.pagination.append('<span></span>');
+				_that.pagination.append('<a href="javascript:;"></a>');
 			}
-			_that.pagination.find('span').eq(0).addClass('on');
+			_that.pagination.find('a').eq(0).addClass('on');
 		}
 		//自动播放
 		if(_that.autoPlay){
@@ -107,12 +107,12 @@ var _slideAnimation = function(num){
 
 //分页器变换
 var _paginationChange = function(){
-	_that.pagination.find('span').eq(_that.slideIndex).addClass('on').siblings().removeClass('on');
+	_that.pagination.find('a').eq(_that.slideIndex).addClass('on').siblings().removeClass('on');
 }
 
 //绑定分页器事件
 var _pageBind = function(){
-	_that.pagination.find('span').on('click', function(){
+	_that.pagination.find('a').on('click', function(){
 		var dotIndex = $(this).index();
 		_that.slideTo(dotIndex);
 	});
