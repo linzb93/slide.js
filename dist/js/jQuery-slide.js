@@ -1,4 +1,4 @@
-function Slider(node, config){
+function Slide(node, config){
 	var defaultPara = {
 		mode: 'horizontal',
 		speed: 500,
@@ -20,12 +20,12 @@ function Slider(node, config){
 	this.pagination = $(defaultPara.pagination),
 	this.pageClickable = defaultPara.pageClickable;
 
-	this.list = this.block.find('ul'),
-	this.li = this.list.find('li'),
-	this.liWidth = this.li.width(),
-	this.liHeight = this.li.height();
+	this.list = this.block.find('ul');
+	var _li = this.list.find('li');
+	this.liWidth = _li.width(),
+	this.liHeight = _li.height();
 
-	var	_length = this.li.length,
+	var	_length = _li.length,
 	_slideLength = Math.ceil((_length - this.perGroup) / this.slidePerView) + 1,
 	_timer = null,
 	_slideIndex = 0,
@@ -118,7 +118,7 @@ var _slideAnimation = function(num){
 
 //分页器变换
 var _paginationChange = function(){
-	_that.pagination.find('a').eq(_slideIndex).addClass('on').siblings().removeClass('on');
+	_that.pagination.find('a').eq(_slideIndex)._onlyClass('on');
 }
 
 //绑定分页器事件
@@ -127,6 +127,11 @@ var _pageBind = function(){
 		var dotIndex = $(this).index();
 		_that.slideTo(dotIndex);
 	});
+}
+
+$.fn._onlyClass = function(obj){
+	$(this).addClass(obj).siblings().removeClass(obj);
+	return $(this);
 }
 
 _init();
