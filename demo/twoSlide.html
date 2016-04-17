@@ -27,8 +27,6 @@
 				<li><div class="blue">Slide 3</div></li>
 				<li><div class="orange">Slide 4</div></li>
 				<li><div class="green">Slide 5</div></li>
-				<li><div class="blue">Slide 6</div></li>
-				<li><div class="orange">Slide 7</div></li>
 			</ul>
 		</div>
 		<a href="javascript:;" title="" class="prev"><</a>
@@ -66,6 +64,7 @@
 			mySlider1.slideNext();
 		});
 		var mySlider2 = new Slider(".slide2 .slide-wrapper", {
+			autoPlay: 2000,
 			pagination: '.slide2 .page',
 			pageClickable: true,
 			perGroup: 3,
