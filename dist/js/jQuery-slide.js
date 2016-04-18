@@ -1,13 +1,14 @@
 function Slide(node, config){
 	var defaultPara = {
-		mode: 'horizontal',
-		speed: 500,
-		perGroup: 1,
-		slidePerView: 1,
-		autoPlay: 0,
-		loop: true,
-		pagination: null,
-		pageClickable: true
+		mode: 'horizontal',  //滚动方向（水平或竖直）
+		speed: 500,  //滚动速度
+		perGroup: 1,  //显示数量
+		slidePerView: 1,  //每次滚动的数量
+		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效	
+		loop: true,  //是否循环滚动
+		pagination: null,  //分页器
+		pageClickable: true,  //分页器是否可点击
+		fullPage: false  //是否全屏滚动
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -18,7 +19,8 @@ function Slide(node, config){
 	this.autoPlay = defaultPara.autoPlay,
 	this.loop = defaultPara.loop,
 	this.pagination = $(defaultPara.pagination),
-	this.pageClickable = defaultPara.pageClickable;
+	this.pageClickable = defaultPara.pageClickable,
+	this.fullPage = defaultPara.fullPage;
 
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
@@ -58,8 +60,13 @@ var _init = function(){
 				_that.slideNext(true);
 			}, _that.autoPlay);
 		}
+		//绑定分页器事件
 		if(_that.pageClickable){
 			_pageBind();
+		}
+		//绑定鼠标滚轮事件
+		if(_that.fullPage){
+			_bindMouseWheel();
 		}
 	}
 
@@ -126,6 +133,24 @@ var _pageBind = function(){
 	_that.pagination.find('a').on('click', function(){
 		var dotIndex = $(this).index();
 		_that.slideTo(dotIndex);
+	});
+}
+
+//绑定鼠标滚轮事件
+var _bindMouseWheel = function(){
+	$(document).on({
+		'mousewheel': function(e){
+			e.originalEvent.wheelDelta > 0 ?
+			_that.slidePrev():
+			_that.slideNext();
+			return false;
+		},
+		'DOMMouseScroll': function(e){
+			e.originalEvent.detail < 0 ?
+			_that.slidePrev():
+			_that.slideNext();
+			return false;
+		}
 	});
 }
 
