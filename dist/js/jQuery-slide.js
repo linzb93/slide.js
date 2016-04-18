@@ -4,7 +4,7 @@ function Slide(node, config){
 		speed: 500,  //滚动速度
 		perGroup: 1,  //显示数量
 		slidePerView: 1,  //每次滚动的数量
-		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效	
+		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
 		loop: true,  //是否循环滚动
 		pagination: null,  //分页器
 		pageClickable: true,  //分页器是否可点击
@@ -37,22 +37,37 @@ function Slide(node, config){
 //初始化
 var _init = function(){
 		//设定轮播样式
-		if(_that.mode === 'horizontal'){
-			_that.block.width(_that.liWidth * _that.perGroup);
-			_that.list.width(_that.liWidth * _length);
-			_that.list.addClass('slide-horizontal');
+		if(_that.fullPage){
+			var body = $("body");
+			_li.width(body.width());
+			_li.height(body.height());
+			if(_that.mode === 'horizontal'){
+				_that.liWidth = _li.width();
+				_that.list.width(_that.liWidth * _length);
+				_that.list.addClass('slide-horizontal');
+			}
+			else if(_that.mode === 'vertical'){
+				_that.liHeight = _li.height();
+				_that.list.height(_that.liHeight * _length);
+				_that.list.addClass('slide-vertical');
+			}
 		}
-		else if(_that.mode === 'vertical'){
-			_that.block.height(_that.liHeight * _that.perGroup);
-			_that.list.height(_that.liHeight * _length);
-			_that.list.addClass('slide-vertical');
+		else{
+			if(_that.mode === 'horizontal'){
+				_that.block.width(_that.liWidth * _that.perGroup);
+				_that.list.width(_that.liWidth * _length);
+				_that.list.addClass('slide-horizontal');
+			}
+			else if(_that.mode === 'vertical'){
+				_that.block.height(_that.liHeight * _that.perGroup);
+				_that.list.height(_that.liHeight * _length);
+				_that.list.addClass('slide-vertical');
+			}
 		}
+
 		//添加分页器
 		if(_canShowPagination){
-			for(var i = 0; i< _length; i++){
-				_that.pagination.append('<a href="javascript:;"></a>');
-			}
-			_that.pagination.find('a').eq(0).addClass('on');
+			_createPagination();
 		}
 		//自动播放
 		if(_that.autoPlay){
@@ -60,13 +75,9 @@ var _init = function(){
 				_that.slideNext(true);
 			}, _that.autoPlay);
 		}
-		//绑定分页器事件
-		if(_that.pageClickable){
-			_pageBind();
-		}
 		//绑定鼠标滚轮事件
 		if(_that.fullPage){
-			_bindMouseWheel();
+			$(document).on("mousewheel DOMMouseScroll", _bindMouseWheel);
 		}
 	}
 
@@ -110,16 +121,17 @@ var _init = function(){
 		_slideAnimation(-_delta * _that.slidePerView);
 	}
 
-//执行滚动
-var _slideAnimation = function(num){
-	if(_that.mode === 'horizontal'){
-		_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
+//初始化分页
+var _createPagination = function(){
+	var pageHtml = '';
+	for(var i = 0; i < _length; i ++){
+		pageHtml += '<a href="javascript:;"></a>';
 	}
-	else if(_that.mode === 'vertical'){
-		_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-	}
-	if(_canShowPagination){
-		_paginationChange();
+	_that.pagination.append(pageHtml);
+	_that.pagination.find('a').eq(0).addClass('on');
+	//绑定分页器事件
+	if(_that.pageClickable){
+		_pageBind();
 	}
 }
 
@@ -137,21 +149,26 @@ var _pageBind = function(){
 }
 
 //绑定鼠标滚轮事件
-var _bindMouseWheel = function(){
-	$(document).on({
-		'mousewheel': function(e){
-			e.originalEvent.wheelDelta > 0 ?
-			_that.slidePrev():
-			_that.slideNext();
-			return false;
-		},
-		'DOMMouseScroll': function(e){
-			e.originalEvent.detail < 0 ?
-			_that.slidePrev():
-			_that.slideNext();
-			return false;
-		}
-	});
+var _bindMouseWheel = function(e){
+	e.preventDefault();
+	var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+	value > 0 ?
+	_that.slidePrev():
+	_that.slideNext();
+	return false;
+}
+
+//执行滚动
+var _slideAnimation = function(num){
+	if(_that.mode === 'horizontal'){
+		_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
+	}
+	else if(_that.mode === 'vertical'){
+		_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
+	}
+	if(_canShowPagination){
+		_paginationChange();
+	}
 }
 
 $.fn._onlyClass = function(obj){
