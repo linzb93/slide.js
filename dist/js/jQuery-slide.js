@@ -22,6 +22,7 @@ function Slide(node, config){
 	this.pageClickable = defaultPara.pageClickable,
 	this.fullPage = defaultPara.fullPage;
 
+
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
 	this.liWidth = _li.width(),
