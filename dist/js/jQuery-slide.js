@@ -8,7 +8,8 @@ function Slide(node, config){
 		loop: true,  //是否循环滚动
 		pagination: null,  //分页器
 		pageClickable: true,  //分页器是否可点击
-		fullPage: false  //是否全屏滚动
+		fullPage: false,  //是否全屏滚动
+		showPageNum: false  //显示分页器数字
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -20,7 +21,8 @@ function Slide(node, config){
 	this.loop = defaultPara.loop,
 	this.pagination = $(defaultPara.pagination),
 	this.pageClickable = defaultPara.pageClickable,
-	this.fullPage = defaultPara.fullPage;
+	this.fullPage = defaultPara.fullPage,
+	this.showPageNum = defaultPara.showPageNum;
 
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
@@ -128,8 +130,17 @@ var _init = function(){
 //初始化分页
 var _createPagination = function(){
 	var pageHtml = '';
-	for(var i = 0; i < _length; i ++){
-		pageHtml += '<a href="javascript:;"></a>';
+	if(_that.showPageNum){
+		var j = 0;
+		for(var i = 0; i < _length; i ++){
+			j = i + 1;
+			pageHtml += '<a href="javascript:;">' + j + '</a>';
+		}
+	}
+	else{
+		for(var i = 0; i < _length; i ++){
+			pageHtml += '<a href="javascript:;"></a>';
+		}
 	}
 	_that.pagination.append(pageHtml);
 	_pageDot = _that.pagination.find('a');
