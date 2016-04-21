@@ -152,11 +152,6 @@ function Slide(node, config){
 	}
 }
 
-	//分页器变换
-	var _paginationChange = function(){
-		_pageDot.eq(_slideIndex)._onlyClass('on');
-	}
-
 	//绑定分页器事件
 	var _pageBind = function(){
 		_pageDot.on('click', function(){
@@ -187,6 +182,11 @@ function Slide(node, config){
 		if(_canShowPagination){
 			_paginationChange();
 		}
+	}
+
+	//分页器变换
+	var _paginationChange = function(){
+		_pageDot.eq(_slideIndex)._onlyClass('on');
 	}
 
 	$.fn._onlyClass = function(obj){
