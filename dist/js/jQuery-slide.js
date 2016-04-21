@@ -23,12 +23,12 @@ function Slide(node, config){
 	this.pageClickable = defaultPara.pageClickable,
 	this.fullPage = defaultPara.fullPage,
 	this.showPageNum = defaultPara.showPageNum;
-
+	//考虑到animate()方法而不得不暴露的变量
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
 	this.liWidth = _li.width(),
 	this.liHeight = _li.height();
-
+	//与轮播直接相关的内部变量
 	var	_length = _li.length,
 	_slideLength = Math.ceil((_length - this.perGroup) / this.slidePerView) + 1,
 	_timer = null,
@@ -36,9 +36,11 @@ function Slide(node, config){
 	_pageDot = null,
 	_canShowPagination = this.pagination && this.perGroup === 1 && this.slidePerView === 1, //是否展示分页器
 	_that = this;
+	//其他内部变量
+	var _body = $("body");
 
-//初始化
-var _init = function(){
+	//初始化
+	var _init = function(){
 		//初始化轮播样式
 		_setStyle();
 
@@ -56,7 +58,7 @@ var _init = function(){
 		if(_that.fullPage){
 			$(document).on("mousewheel DOMMouseScroll", _bindMouseWheel);
 		}
-	}
+	};
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
@@ -100,11 +102,12 @@ var _init = function(){
 
 	//初始化样式
 	var _setStyle = function(){
-		var body = $("body");
+		if (_that.fullPage) {
+			_li.width(_body.width());
+			_li.height(_body.height());
+		}
 		if(_that.mode === 'horizontal'){
 			if(_that.fullPage){
-				_li.width(body.width());
-				_li.height(body.height());
 				_that.liWidth = _li.width();
 			}
 			else{
@@ -115,8 +118,6 @@ var _init = function(){
 		}
 		else if(_that.mode === 'vertical'){
 			if(_that.fullPage){
-				_li.width(body.width());
-				_li.height(body.height());
 				_that.liHeight = _li.height();
 			}
 			else{
@@ -127,70 +128,71 @@ var _init = function(){
 		}
 	};
 
-//初始化分页
-var _createPagination = function(){
-	var pageHtml = '';
-	if(_that.showPageNum){
-		var j = 0;
-		for(var i = 0; i < _length; i ++){
-			j = i + 1;
-			pageHtml += '<a href="javascript:;">' + j + '</a>';
+	//初始化分页
+	var _createPagination = function(){
+		var pageHtml = '';
+		if(_that.showPageNum){
+			var j = 0;
+			for(var i = 0; i < _length; i ++){
+				j = i + 1;
+				pageHtml += '<a href="javascript:;">' + j + '</a>';
+			}
 		}
-	}
-	else{
-		for(var i = 0; i < _length; i ++){
-			pageHtml += '<a href="javascript:;"></a>';
+		else{
+			for(var i = 0; i < _length; i ++){
+				pageHtml += '<a href="javascript:;"></a>';
+			}
 		}
-	}
-	_that.pagination.append(pageHtml);
-	_pageDot = _that.pagination.find('a');
-	_pageDot.eq(0).addClass('on');
+		_that.pagination.append(pageHtml);
+		_pageDot = _that.pagination.find('a');
+		_pageDot.eq(0).addClass('on');
 	//绑定分页器事件
 	if(_that.pageClickable){
 		_pageBind();
 	}
 }
 
-//分页器变换
-var _paginationChange = function(){
-	_pageDot.eq(_slideIndex)._onlyClass('on');
-}
-
-//绑定分页器事件
-var _pageBind = function(){
-	_pageDot.on('click', function(){
-		var dotIndex = $(this).index();
-		_that.slideTo(dotIndex);
-	});
-}
-
-//绑定鼠标滚轮事件
-var _bindMouseWheel = function(e){
-	e.preventDefault();
-	var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
-	value > 0 ?
-	_that.slidePrev():
-	_that.slideNext();
-	return false;
-}
-
-//执行滚动
-var _slideAnimation = function(num){
-	if(_that.mode === 'horizontal'){
-		_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
+	//分页器变换
+	var _paginationChange = function(){
+		_pageDot.eq(_slideIndex)._onlyClass('on');
 	}
-	else if(_that.mode === 'vertical'){
-		_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-	}
-	if(_canShowPagination){
-		_paginationChange();
-	}
-}
 
-$.fn._onlyClass = function(obj){
-	$(this).addClass(obj).siblings().removeClass(obj);
-	return $(this);
-}
+	//绑定分页器事件
+	var _pageBind = function(){
+		_pageDot.on('click', function(){
+			var dotIndex = $(this).index();
+			_that.slideTo(dotIndex);
+		});
+	}
 
-_init();
+	//绑定鼠标滚轮事件
+	var _bindMouseWheel = function(e){
+		e.preventDefault();
+		var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+		value > 0 ?
+		_that.slidePrev() :
+		_that.slideNext();
+		return false;
+	}
+
+	//执行滚动
+	var _slideAnimation = function(num){
+		if(_that.mode === 'horizontal'){
+			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
+		}
+		else if(_that.mode === 'vertical'){
+			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
+		}
+
+		if(_canShowPagination){
+			_paginationChange();
+		}
+	}
+
+	$.fn._onlyClass = function(obj){
+		$(this).addClass(obj).siblings().removeClass(obj);
+		return $(this);
+	}
+
+	_init();
 }
