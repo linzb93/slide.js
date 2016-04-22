@@ -6,7 +6,7 @@ jQuery-slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比�
 
 ##使用方法
 
-###引入三个个文件：jQuery1.3+、slide.css和jQuery-slide.js
+###引入三个文件：jQuery1.3+、slide.css和jQuery-slide.js
 ```html
 <link rel="stylesheet" type="text/css" href="slide.css">
 ...
@@ -39,7 +39,8 @@ jQuery-slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比�
 
 var mySlide = new Slide('.slide-wrapper', {
 autoplay: 3000,
-speed: 500});
+speed: 500
+});
 
 ```
 其中，autoplay表示自动播放的间隔时间，speed表示图片切换的速度。这样，通过新建Slide这个对象的实例，我们就建立了一个轮播图。
@@ -47,10 +48,10 @@ speed: 500});
 使用按钮切换轮播图：
 ```javascript
 $leftBtn.on('click', function(){
-mySlide.slidePrev();
+	mySlide.slidePrev();
 });
 $rightBtn.on('click', function(){
-mySlide.slideNext();
+	mySlide.slideNext();
 });
 ```
 ##其他

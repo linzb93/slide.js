@@ -37,7 +37,8 @@ function Slide(node, config){
 	_canShowPagination = this.pagination && this.perGroup === 1 && this.slidePerView === 1, //是否展示分页器
 	_that = this;
 	//其他内部变量
-	var _body = $("body");
+	var _body = $("body"),
+	_isLowIE = false;
 
 	//初始化
 	var _init = function(){
@@ -48,6 +49,8 @@ function Slide(node, config){
 		if(_canShowPagination){
 			_createPagination();
 		}
+		//检测浏览器是否支持transform & transition
+		_isLowIE = _browserVersion();
 		//自动播放
 		if(_that.autoPlay){
 			_timer = setInterval(function(){
@@ -168,6 +171,10 @@ function Slide(node, config){
 		_that.slidePrev() :
 		_that.slideNext();
 		return false;
+	}
+
+	var _browserVersion = function(){
+		return document.documentmode < 10 ? true : false;
 	}
 
 	//执行滚动
