@@ -135,14 +135,15 @@ function Slide(node, config){
 	var _createPagination = function(){
 		var pageHtml = '';
 		if(_that.showPageNum){
-			var j = 0;
-			for(var i = 0; i < _length; i ++){
+			var j = 0,
+			i = 0;
+			for(i = 0; i < _length; i ++){
 				j = i + 1;
 				pageHtml += '<a href="javascript:;">' + j + '</a>';
 			}
 		}
 		else{
-			for(var i = 0; i < _length; i ++){
+			for(i = 0; i < _length; i ++){
 				pageHtml += '<a href="javascript:;"></a>';
 			}
 		}
