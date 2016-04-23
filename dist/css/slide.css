@@ -2,3 +2,6 @@
 .slide-horizontal{position: relative;left: 0;}
 .slide-horizontal li{float: left;}
 .slide-vertical{position: relative;top: 0;}
+.slide-fade{position: relative;}
+.slide-fade li{position: absolute;left: 0;top: 0;display: none;}
+.slide-fade li.on{display: list-item;}
