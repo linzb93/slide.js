@@ -9,7 +9,8 @@ function Slide(node, config){
 		pagination: null,  //分页器
 		pageClickable: true,  //分页器是否可点击
 		fullPage: false,  //是否全屏滚动
-		showPageNum: false  //显示分页器数字
+		showPageNum: false,  //显示分页器数字
+		fadeInAndOut: false  //渐显与渐隐轮播
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -22,7 +23,8 @@ function Slide(node, config){
 	this.pagination = $(defaultPara.pagination),
 	this.pageClickable = defaultPara.pageClickable,
 	this.fullPage = defaultPara.fullPage,
-	this.showPageNum = defaultPara.showPageNum;
+	this.showPageNum = defaultPara.showPageNum,
+	this.fadeInAndOut = defaultPara.fadeInAndOut;
 	//考虑到animate()方法而不得不暴露的变量
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
@@ -35,6 +37,7 @@ function Slide(node, config){
 	_slideIndex = 0,
 	_pageDot = null,
 	_canShowPagination = this.pagination && this.perGroup === 1 && this.slidePerView === 1, //是否展示分页器
+  _canFade = this.fadeInAndOut && this.perGroup === 1 && this.slidePerView === 1,  //是否允许渐隐渐显式轮播
 	_that = this;
 	//其他内部变量
 	var _body = $("body");
@@ -43,7 +46,6 @@ function Slide(node, config){
 	var _init = function(){
 		//初始化轮播样式
 		_setStyle();
-
 		//添加分页器
 		if(_canShowPagination){
 			_createPagination();
@@ -64,7 +66,12 @@ function Slide(node, config){
 		clearInterval(_timer);
 		if(_slideIndex > 0){
 			_slideIndex --;
-			_slideAnimation(this.slidePerView);
+			if(!_canFade){
+				_slideAnimation(this.slidePerView);
+			}
+			else{
+				_slideAnimation(_slideIndex);
+			}
 		}
 		else{
 			if(this.loop){
@@ -79,7 +86,12 @@ function Slide(node, config){
 		}
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
-			_slideAnimation(-this.slidePerView);
+			if(!_canFade){
+				_slideAnimation(-this.slidePerView);
+			}
+			else{
+				_slideAnimation(_slideIndex);
+			}
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
 			}
@@ -95,67 +107,71 @@ function Slide(node, config){
 		if(!notClear){
 			clearInterval(_timer);
 		}
-		var _delta = num - _slideIndex;
-		_slideIndex = num;
-		_slideAnimation(-_delta * _that.slidePerView);
-	}
+    if(_canFade){
+      _slideIndex = num;
+     _slideAnimation(_slideIndex);
+   }
+   else{
+    var _delta = num - _slideIndex;
+    _slideIndex = num;
+     _slideAnimation(-_delta * _that.slidePerView);
+   }
+ };
 
 	//初始化样式
 	var _setStyle = function(){
-		if (_that.fullPage) {
-			_li.width(_body.width());
-			_li.height(_body.height());
-		}
-		if(_that.mode === 'horizontal'){
-			if(_that.fullPage){
-				_that.liWidth = _li.width();
-			}
-			else{
-				_that.block.width(_that.liWidth * _that.perGroup);
-			}
-			_that.list.width(_that.liWidth * _length);
-			_that.list.addClass('slide-horizontal');
-		}
-		else if(_that.mode === 'vertical'){
-			if(_that.fullPage){
-				_that.liHeight = _li.height();
-			}
-			else{
-				_that.block.height(_that.liHeight * _that.perGroup);
-			}
-			_that.list.height(_that.liHeight * _length);
-			_that.list.addClass('slide-vertical');
-		}
-	};
+    if(_canFade){
+      _that.block.width(_that.liWidth).height(_that.liHeight);
+      _that.list.addClass('slide-fade');
+      _li.eq(0).addClass('on');
+      return;
+    }
+    if (_that.fullPage) {
+     _li.width(_body.width());
+     _li.height(_body.height());
+   }
+   if(_that.mode === 'horizontal'){
+     if(_that.fullPage){
+      _that.liWidth = _li.width();
+    }
+    else{
+      _that.block.width(_that.liWidth * _that.perGroup);
+    }
+    _that.list.width(_that.liWidth * _length);
+    _that.list.addClass('slide-horizontal');
+  }
+  else{
+   if(_that.fullPage){
+    _that.liHeight = _li.height();
+  }
+  else{
+    _that.block.height(_that.liHeight * _that.perGroup);
+  }
+  _that.list.height(_that.liHeight * _length);
+  _that.list.addClass('slide-vertical');
+}
+};
 
 	//初始化分页
 	var _createPagination = function(){
 		var pageHtml = '';
-		if(_that.showPageNum){
-			var j = 0;
-			for(var i = 0; i < _length; i ++){
-				j = i + 1;
-				pageHtml += '<a href="javascript:;">' + j + '</a>';
-			}
-		}
-		else{
-			for(var i = 0; i < _length; i ++){
-				pageHtml += '<a href="javascript:;"></a>';
-			}
+		for(var i = 0; i < _length; i ++){
+			j = _that.showPageNum ? i + 1 : '';
+			pageHtml += '<a href="javascript:;">' + j + '</a>';
 		}
 		_that.pagination.append(pageHtml);
 		_pageDot = _that.pagination.find('a');
 		_pageDot.eq(0).addClass('on');
-	//绑定分页器事件
-	if(_that.pageClickable){
-		_pageBind();
-	}
-}
+		//绑定分页器事件
+		if(_that.pageClickable){
+			_pageBind();
+		}
+	};
 
 	//分页器变换
 	var _paginationChange = function(){
 		_pageDot.eq(_slideIndex)._onlyClass('on');
-	}
+	};
 
 	//绑定分页器事件
 	var _pageBind = function(){
@@ -163,7 +179,7 @@ function Slide(node, config){
 			var dotIndex = $(this).index();
 			_that.slideTo(dotIndex);
 		});
-	}
+	};
 
 	//绑定鼠标滚轮事件
 	var _bindMouseWheel = function(e){
@@ -172,27 +188,30 @@ function Slide(node, config){
 		value > 0 ?
 		_that.slidePrev() :
 		_that.slideNext();
-		return false;
-	}
+	};
 
 	//执行滚动
 	var _slideAnimation = function(num){
-		if(_that.mode === 'horizontal'){
-			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
-		}
-		else if(_that.mode === 'vertical'){
-			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-		}
+    if(_canFade){
+      _li.eq(num).fadeIn(300).siblings().fadeOut(300);
+    }
+    else{
+      if(_that.mode === 'horizontal'){
+        _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
+      }
+      else{
+        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
+      }
+    }
+    if(_canShowPagination){
+     _paginationChange();
+   }
+ };
 
-		if(_canShowPagination){
-			_paginationChange();
-		}
-	}
+ $.fn._onlyClass = function(obj){
+  $(this).addClass(obj).siblings().removeClass(obj);
+  return $(this);
+}
 
-	$.fn._onlyClass = function(obj){
-		$(this).addClass(obj).siblings().removeClass(obj);
-		return $(this);
-	}
-
-	_init();
+_init();
 }
