@@ -19,10 +19,11 @@ speed: 500});
 | perGroup | number | 1 | 3 | 显示数量 | |
 | slidePerView | number | 1 | 3 | 每次滚动的数量 | |
 | autoPlay | number | 0 | 3000 |自动滚动的时间间隔，大于0时有效 | |
-| pagination | HTML Element | null | .page | 分页器 | |
+| pagination | HTML Element | null | .page | 分页器 | 单页滚动时有效 |
 | pageClickable | bool | true | false | 分页器是否可点击 | |
 | loop | bool | true | false | 是否循环滚动 | 于V1.0.1添加 |
-| fullPage | bool | false | true | 是否全屏滚动 | 于V1.1添加 |
+| fullPage | bool | false | true | 是否全屏滚动 | 于V1.1添加。单页滚动时有效。 |
 | showPageNum | bool | false | true | 是否在分页按钮中显示数字 | 于V1.1添加 |
-
-_注：所有新增的和修改的变量都会在“备注”一列中注明更新的版本。_
+| fadeInAndOut | bool | false | true | 是否使用渐隐渐显式轮播。单页滚动时有效 | 于V1.1添加 |
+_注：（1）所有新增的和修改的变量都会在“备注”一列中注明更新的版本。_
+_（2）所有在备注标明“单页滚动时有效”的参数，如果同时使用了多页滚动的参数也没事，代码里面已经控制了。_
