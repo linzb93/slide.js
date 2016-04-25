@@ -1,4 +1,7 @@
 function Slide(node, config){
+	if (typeof $ === 'undefined') {
+		throw new Error('this requires jQuery');
+	}
 	var defaultPara = {
 		mode: 'horizontal',  //滚动方向（水平或竖直）
 		speed: 500,  //滚动速度
@@ -68,12 +71,9 @@ function Slide(node, config){
 		clearInterval(_timer);
 		if(_slideIndex > 0){
 			_slideIndex --;
-			if(!_canFade){
-				_slideAnimation(this.slidePerView);
-			}
-			else{
-				_slideAnimation(_slideIndex);
-			}
+			!_canFade ?
+			_slideAnimation(this.slidePerView) :
+			_slideAnimation(_slideIndex);
 		}
 		else{
 			if(this.loop){
@@ -88,12 +88,9 @@ function Slide(node, config){
 		}
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
-			if(!_canFade){
-				_slideAnimation(-this.slidePerView);
-			}
-			else{
-				_slideAnimation(_slideIndex);
-			}
+			!_canFade ?
+			_slideAnimation(-this.slidePerView) :
+			_slideAnimation(_slideIndex);
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
 			}
@@ -133,25 +130,18 @@ function Slide(node, config){
 			_li.height(_body.height());
 		}
 		if(_that.mode === 'horizontal'){
-			if(_that.fullPage){
-				_that.liWidth = _li.width();
-			}
-			else{
-				_that.block.width(_that.liWidth * _that.perGroup);
-			}
+			_that.fullPage ?
+			_that.liWidth = _li.width() :
+			_that.block.width(_that.liWidth * _that.perGroup);
 			_that.list.width(_that.liWidth * _length);
-			_that.list.addClass('slide-horizontal');
 		}
 		else{
-			if(_that.fullPage){
-				_that.liHeight = _li.height();
-			}
-			else{
-				_that.block.height(_that.liHeight * _that.perGroup);
-			}
+			_that.fullPage ?
+			_that.liHeight = _li.height() :
+			_that.block.height(_that.liHeight * _that.perGroup);
 			_that.list.height(_that.liHeight * _length);
-			_that.list.addClass('slide-vertical');
 		}
+		_that.list.addClass('slide-' + _that.mode);
 	};
 
 	//初始化分页
