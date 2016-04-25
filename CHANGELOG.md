@@ -23,4 +23,4 @@ V1.0.1
 V1.0
 ---
 ###2016年4月16日
-- jQuery-slide.js V1.0正式发布，使用方法详见[API.md](https://github.com/linzb93/slide/blob/master/API.md)
+- jQuery.slide.js V1.0正式发布，使用方法详见[API.md](https://github.com/linzb93/slide/blob/master/API.md)

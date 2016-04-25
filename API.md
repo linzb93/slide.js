@@ -1,4 +1,4 @@
-#jQuery-slide.js API
+#jQuery.slide.js API
 
 ```javascript
 var mySlide = new Slide('.slide-wrapper', {
@@ -7,7 +7,7 @@ var mySlide = new Slide('.slide-wrapper', {
 });
 ```
 
-这是jQuery-slide.js最简单的使用方式。slide最外层的是`class="slide-wrapper"`的元素（可以用其他类名或ID名称表示，但在slide.css里".slide-wrapper"的属性也要拷过去），里面是ul，再里面是li，也就是每一个slide的基本单位。ul、li是固定的，所以不需要另外给它们添加类或ID。
+这是jQuery.slide.js最简单的使用方式。slide最外层的是`class="slide-wrapper"`的元素（可以用其他类名或ID名称表示，但在jQuery.slide.css里".slide-wrapper"的属性也要拷过去），里面是ul，再里面是li，也就是每一个slide的基本单位。ul、li是固定的，所以不需要另外给它们添加类或ID。
 
 在分页器里，所有的分页按钮都是a标签，没有class，那个特殊的、对应当前页面的那个分页按钮加了`class="on"`。
 
