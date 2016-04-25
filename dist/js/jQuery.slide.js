@@ -167,7 +167,7 @@ function Slide(node, config){
 
 	//分页器变换
 	var _paginationChange = function(){
-		_pageDot.eq(_slideIndex)._onlyClass('on');
+		_pageDot.eq(_slideIndex).addClass('on').siblings().removeClass('on');
 	};
 
 	//绑定分页器事件
@@ -196,17 +196,11 @@ function Slide(node, config){
 			_that.mode === 'horizontal' ?
 			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed) :
 			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-
 		}
 		if(_canShowPagination){
 			_paginationChange();
 		}
 	};
-
-	$.fn._onlyClass = function(obj){
-		$(this).addClass(obj).siblings().removeClass(obj);
-		return $(this);
-	}
 
 	_init();
 }
