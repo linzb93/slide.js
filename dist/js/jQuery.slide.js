@@ -143,6 +143,7 @@ function Slide(node, config){
 	//初始化分页
 	var _createPagination = function(){
 		if(_that.outerPagination){
+			_that.pagination.children().length === _length ?
 			_pageDot = _that.pagination.children() :
 			_pageDot = null;
 		}
