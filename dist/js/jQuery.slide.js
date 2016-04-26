@@ -1,6 +1,6 @@
 function Slide(node, config){
 	if (typeof $ === 'undefined') {
-		throw new Error('this requires jQuery');
+		throw new Error('需要引入jQuery文件');
 	}
 	var defaultPara = {
 		mode: 'horizontal',  //滚动方向（水平或竖直）
@@ -57,7 +57,7 @@ function Slide(node, config){
 		}
 		//自动播放
 		_setAutoPlay();
-		//绑定鼠标滚轮事件
+		//全屏模式下绑定鼠标滚轮事件
 		if(_that.fullPage){
 			$(document).on("mousewheel DOMMouseScroll", _bindMouseWheel);
 		}
@@ -73,7 +73,7 @@ function Slide(node, config){
 		}
 		else{
 			if(this.loop){
-				this.slideTo(_slideLength - 1);
+				_slideTo(_slideLength - 1);
 			}
 		}
 	};
@@ -93,12 +93,12 @@ function Slide(node, config){
 		}
 		else{
 			if(this.loop){
-				this.slideTo(0, notClear);
+				_slideTo(0, notClear);
 			}
 		}
 	};
 
-	this.slideTo = function(num, notClear){
+	var _slideTo = function(num, notClear){
 		if(!notClear){
 			clearInterval(_timer);
 		}
@@ -143,7 +143,8 @@ function Slide(node, config){
 	//初始化分页
 	var _createPagination = function(){
 		if(_that.outerPagination){
-			_pageDot = _that.pagination.children();
+			_pageDot = _that.pagination.children().length <== _length ?
+			_that.pagination.children() : null;
 		}
 		else{
 			var pageHtml = '';
@@ -152,7 +153,7 @@ function Slide(node, config){
 				pageHtml += '<a href="javascript:;">' + j + '</a>';
 			}
 			_that.pagination.append(pageHtml);
-			_pageDot = _that.pagination.find('a');
+			_pageDot = _that.pagination.children();
 		}
 		_pageDot.eq(0).addClass('on');
 		//绑定分页器事件
@@ -177,8 +178,7 @@ function Slide(node, config){
 	//绑定分页器事件
 	var _pageBind = function(){
 		_pageDot.on('click', function(){
-			var dotIndex = $(this).index();
-			_that.slideTo(dotIndex);
+			_slideTo($(this).index());
 		});
 	};
 
