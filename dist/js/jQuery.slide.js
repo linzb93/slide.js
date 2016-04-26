@@ -56,11 +56,7 @@ function Slide(node, config){
 			_createPagination();
 		}
 		//自动播放
-		if(_that.autoPlay){
-			_timer = setInterval(function(){
-				_that.slideNext(true);
-			}, _that.autoPlay);
-		}
+		_setAutoPlay();
 		//绑定鼠标滚轮事件
 		if(_that.fullPage){
 			$(document).on("mousewheel DOMMouseScroll", _bindMouseWheel);
@@ -162,6 +158,14 @@ function Slide(node, config){
 		//绑定分页器事件
 		if(_that.pageClickable){
 			_pageBind();
+		}
+	};
+
+	var _setAutoPlay =function(){
+		if(_that.autoPlay){
+			_timer = setInterval(function(){
+				_that.slideNext(true);
+			}, _that.autoPlay);
 		}
 	};
 
