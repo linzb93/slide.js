@@ -1,4 +1,7 @@
 function Slide(node, config){
+	if (typeof $ === 'undefined') {
+		throw new Error('需要引入jQuery文件');
+	}
 	var defaultPara = {
 		mode: 'horizontal',  //滚动方向（水平或竖直）
 		speed: 500,  //滚动速度
@@ -7,10 +10,11 @@ function Slide(node, config){
 		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
 		loop: true,  //是否循环滚动
 		pagination: null,  //分页器
+		outerPagination: false,  //是否是外部的分页器
 		pageClickable: true,  //分页器是否可点击
 		fullPage: false,  //是否全屏滚动
-		showPageNum: false,  //显示分页器数字
-		fadeInAndOut: false  //渐显与渐隐轮播
+		showPageNum: false,  //是否显示分页器数字
+		fadeInAndOut: false  //是否渐显与渐隐轮播
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
@@ -21,6 +25,7 @@ function Slide(node, config){
 	this.autoPlay = defaultPara.autoPlay,
 	this.loop = defaultPara.loop,
 	this.pagination = $(defaultPara.pagination),
+	this.outerPagination = defaultPara.outerPagination,
 	this.pageClickable = defaultPara.pageClickable,
 	this.fullPage = defaultPara.fullPage,
 	this.showPageNum = defaultPara.showPageNum,
@@ -38,7 +43,7 @@ function Slide(node, config){
 	_pageDot = null,
 	_canShowPagination = this.pagination && this.perGroup === 1 && this.slidePerView === 1, //是否展示分页器
   _canFade = this.fadeInAndOut && this.perGroup === 1 && this.slidePerView === 1,  //是否允许渐隐渐显式轮播
-	_that = this;
+  _that = this;
 	//其他内部变量
 	var _body = $("body");
 
@@ -51,12 +56,8 @@ function Slide(node, config){
 			_createPagination();
 		}
 		//自动播放
-		if(_that.autoPlay){
-			_timer = setInterval(function(){
-				_that.slideNext(true);
-			}, _that.autoPlay);
-		}
-		//绑定鼠标滚轮事件
+		_setAutoPlay();
+		//全屏模式下绑定鼠标滚轮事件
 		if(_that.fullPage){
 			$(document).on("mousewheel DOMMouseScroll", _bindMouseWheel);
 		}
@@ -66,16 +67,13 @@ function Slide(node, config){
 		clearInterval(_timer);
 		if(_slideIndex > 0){
 			_slideIndex --;
-			if(!_canFade){
-				_slideAnimation(this.slidePerView);
-			}
-			else{
-				_slideAnimation(_slideIndex);
-			}
+			!_canFade ?
+			_slideAnimation(this.slidePerView) :
+			_slideAnimation(_slideIndex);
 		}
 		else{
 			if(this.loop){
-				this.slideTo(_slideLength - 1);
+				_slideTo(_slideLength - 1);
 			}
 		}
 	};
@@ -86,81 +84,78 @@ function Slide(node, config){
 		}
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
-			if(!_canFade){
-				_slideAnimation(-this.slidePerView);
-			}
-			else{
-				_slideAnimation(_slideIndex);
-			}
+			!_canFade ?
+			_slideAnimation(-this.slidePerView) :
+			_slideAnimation(_slideIndex);
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
 			}
 		}
 		else{
 			if(this.loop){
-				this.slideTo(0, notClear);
+				_slideTo(0, notClear);
 			}
 		}
 	};
 
-	this.slideTo = function(num, notClear){
+	var _slideTo = function(num, notClear){
 		if(!notClear){
 			clearInterval(_timer);
 		}
-    if(_canFade){
-      _slideIndex = num;
-     _slideAnimation(_slideIndex);
-   }
-   else{
-    var _delta = num - _slideIndex;
-    _slideIndex = num;
-     _slideAnimation(-_delta * _that.slidePerView);
-   }
- };
+		if(_canFade){
+			_slideIndex = num;
+			_slideAnimation(_slideIndex);
+		}
+		else{
+			var _delta = num - _slideIndex;
+			_slideIndex = num;
+			_slideAnimation(-_delta * _that.slidePerView);
+		}
+	};
 
 	//初始化样式
 	var _setStyle = function(){
-    if(_canFade){
-      _that.block.width(_that.liWidth).height(_that.liHeight);
-      _that.list.addClass('slide-fade');
-      _li.eq(0).addClass('on');
-      return;
-    }
-    if (_that.fullPage) {
-     _li.width(_body.width());
-     _li.height(_body.height());
-   }
-   if(_that.mode === 'horizontal'){
-     if(_that.fullPage){
-      _that.liWidth = _li.width();
-    }
-    else{
-      _that.block.width(_that.liWidth * _that.perGroup);
-    }
-    _that.list.width(_that.liWidth * _length);
-    _that.list.addClass('slide-horizontal');
-  }
-  else{
-   if(_that.fullPage){
-    _that.liHeight = _li.height();
-  }
-  else{
-    _that.block.height(_that.liHeight * _that.perGroup);
-  }
-  _that.list.height(_that.liHeight * _length);
-  _that.list.addClass('slide-vertical');
-}
-};
+		if(_canFade){
+			_that.block.width(_that.liWidth).height(_that.liHeight);
+			_that.list.addClass('slide-fade');
+			_li.eq(0).addClass('on');
+			return;
+		}
+		if (_that.fullPage) {
+			_li.width(_body.width());
+			_li.height(_body.height());
+		}
+		if(_that.mode === 'horizontal'){
+			_that.fullPage ?
+			_that.liWidth = _li.width() :
+			_that.block.width(_that.liWidth * _that.perGroup);
+			_that.list.width(_that.liWidth * _length);
+		}
+		else{
+			_that.fullPage ?
+			_that.liHeight = _li.height() :
+			_that.block.height(_that.liHeight * _that.perGroup);
+			_that.list.height(_that.liHeight * _length);
+		}
+		_that.list.addClass('slide-' + _that.mode);
+	};
 
 	//初始化分页
 	var _createPagination = function(){
-		var pageHtml = '';
-		for(var i = 0; i < _length; i ++){
-			j = _that.showPageNum ? i + 1 : '';
-			pageHtml += '<a href="javascript:;">' + j + '</a>';
+		if(_that.outerPagination){
+			_that.pagination.children().length === _length ?
+			_pageDot = _that.pagination.children() :
+			_pageDot = null;
 		}
-		_that.pagination.append(pageHtml);
-		_pageDot = _that.pagination.find('a');
+		else{
+			var pageHtml = '';
+			for(var i = 0; i < _length; i ++){
+				j = _that.showPageNum ? i + 1 : '';
+				pageHtml += '<a href="javascript:;">' + j + '</a>';
+			}
+			_that.pagination.append(pageHtml);
+			_pageDot = _that.pagination.children();
+		}
 		_pageDot.eq(0).addClass('on');
 		//绑定分页器事件
 		if(_that.pageClickable){
@@ -168,16 +163,23 @@ function Slide(node, config){
 		}
 	};
 
+	var _setAutoPlay =function(){
+		if(_that.autoPlay){
+			_timer = setInterval(function(){
+				_that.slideNext(true);
+			}, _that.autoPlay);
+		}
+	};
+
 	//分页器变换
 	var _paginationChange = function(){
-		_pageDot.eq(_slideIndex)._onlyClass('on');
+		_pageDot.eq(_slideIndex).addClass('on').siblings().removeClass('on');
 	};
 
 	//绑定分页器事件
 	var _pageBind = function(){
 		_pageDot.on('click', function(){
-			var dotIndex = $(this).index();
-			_that.slideTo(dotIndex);
+			_slideTo($(this).index());
 		});
 	};
 
@@ -192,26 +194,18 @@ function Slide(node, config){
 
 	//执行滚动
 	var _slideAnimation = function(num){
-    if(_canFade){
-      _li.eq(num).fadeIn(300).siblings().fadeOut(300);
-    }
-    else{
-      if(_that.mode === 'horizontal'){
-        _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed);
-      }
-      else{
-        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
-      }
-    }
-    if(_canShowPagination){
-     _paginationChange();
-   }
- };
+		if(_canFade){
+			_li.eq(num).fadeIn(300).siblings().fadeOut(300);
+		}
+		else{
+			_that.mode === 'horizontal' ?
+			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed) :
+			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
+		}
+		if(_canShowPagination){
+			_paginationChange();
+		}
+	};
 
- $.fn._onlyClass = function(obj){
-  $(this).addClass(obj).siblings().removeClass(obj);
-  return $(this);
-}
-
-_init();
+	_init();
 }

@@ -1,17 +1,17 @@
-# 关于 jQuery-slide.js
+# 关于 jQuery.slide.js
 ##简介
-jQuery-slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比，jQuery-slide.js体积较小，节省浏览器的解析时间，并且拥有Swiper的多数常用功能。
+jQuery.slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比，jQuery.slide.js体积较小，节省浏览器的解析时间，并且拥有Swiper的多数常用功能。
 
 这个插件的参数列表和Swiper几乎是一样的，如果你使用过Swiper那再好不过了。如果你没有使用过Swiper，那我这里简单讲下参数列表的使用方法。
 
 ##使用方法
 
-###引入三个文件：jQuery1.3+、slide.css和jQuery-slide.js
+###引入三个文件：jQuery1.3+、jQuery.slide.css和jQuery.slide.js
 ```html
-<link rel="stylesheet" type="text/css" href="slide.css">
+<link rel="stylesheet" type="text/css" href="jQuery.slide.css">
 ...
 <script type="text/javascript" src="jquery-1.8.0.min.js"></script>
-<script type="text/javascript" src="jQuery-slide.js"></script>
+<script type="text/javascript" src="jQuery.slide.js"></script>
 ```
 
 ###HTML结构
@@ -57,4 +57,4 @@ $rightBtn.on('click', function(){
 ##其他
 其他参数列表会在[API.md](https://github.com/linzb93/slide/blob/master/API.md)里面展现，这里不再重复。
 
-_注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的，也可以下载压缩版jQuery-slide-min.js。_
+_注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的，也可以下载压缩版jQuery.slide.min.js。_
