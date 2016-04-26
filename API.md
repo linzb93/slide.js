@@ -15,7 +15,7 @@ var mySlide = new Slide('.slide-wrapper', {
 
 | 参数 | 类型 | 默认值 | 可选值 | 含义 | 备注
 | :----: | :----: | :----: | :----: | ----- | ----- |
-| mode | HTML Element | 'horizontal' | 'vertical' | 滚动方向（水平或竖直）| |
+| mode | string | 'horizontal' | 'vertical' | 滚动方向（水平或竖直）| |
 | speed | number | 500 | 800 | 滚动速度 | |
 | perGroup | number | 1 | 3 | 显示数量 | |
 | slidePerView | number | 1 | 3 | 每次滚动的数量 | |
