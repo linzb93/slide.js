@@ -7,6 +7,7 @@ V1.3
 - 添加检测jQuery文件是否存在的代码
 - 规范文件命名格式，jQuery-slide.js更名为jQuery.slide.js，jQuery-slide.min.js更名为jQuery.slide.min.js，slide.css更名为jQuery.slide.css
 - 优化代码，删除无用方法
+- SlideTo()方法不再对外公开
 - 修复文档描述错误
 - 为规范参数名称，便于记忆，有两个参数将在下个版本更名，分别是mode和perSlideView，mode更名为dir，perSlideView更名为slidePerView,还望周知
 - jQuery-slide.js 2.0版已在开发中。2.0版将采用jQuery插件最常用的挂在jQuery原型下的方式。如果2.0版开发成功，1.x版将不再维护
