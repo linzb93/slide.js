@@ -3,10 +3,10 @@ function Slide(node, config){
 		throw new Error('需要引入jQuery文件');
 	}
 	var defaultPara = {
-		mode: 'horizontal',  //滚动方向（水平或竖直）
+		dir: 'horizontal',  //滚动方向（水平或竖直）
 		speed: 500,  //滚动速度
 		perGroup: 1,  //显示数量
-		slidePerView: 1,  //每次滚动的数量
+		perSlideView: 1,  //每次滚动的数量
 		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
 		loop: true,  //是否循环滚动
 		pagination: null,  //分页器
@@ -18,10 +18,10 @@ function Slide(node, config){
 	};
 	$.extend(defaultPara, config);
 	this.block = $(node),
-	this.mode = defaultPara.mode,
+	this.dir = defaultPara.dir,
 	this.speed = defaultPara.speed,
 	this.perGroup = defaultPara.perGroup,
-	this.slidePerView = defaultPara.slidePerView,
+	this.perSlideView = defaultPara.perSlideView,
 	this.autoPlay = defaultPara.autoPlay,
 	this.loop = defaultPara.loop,
 	this.pagination = $(defaultPara.pagination),
@@ -37,12 +37,12 @@ function Slide(node, config){
 	this.liHeight = _li.height();
 	//与轮播直接相关的内部变量
 	var	_length = _li.length,
-	_slideLength = Math.ceil((_length - this.perGroup) / this.slidePerView) + 1,
+	_slideLength = Math.ceil((_length - this.perGroup) / this.perSlideView) + 1,
 	_timer = null,
 	_slideIndex = 0,
 	_pageDot = null,
-	_canShowPagination = this.pagination && this.perGroup === 1 && this.slidePerView === 1, //是否展示分页器
-  _canFade = this.fadeInAndOut && this.perGroup === 1 && this.slidePerView === 1,  //是否允许渐隐渐显式轮播
+	_canShowPagination = this.pagination && this.perGroup === 1 && this.perSlideView === 1, //是否展示分页器
+  _canFade = this.fadeInAndOut && this.perGroup === 1 && this.perSlideView === 1,  //是否允许渐隐渐显式轮播
   _that = this;
 	//其他内部变量
 	var _body = $("body");
@@ -68,7 +68,7 @@ function Slide(node, config){
 		if(_slideIndex > 0){
 			_slideIndex --;
 			!_canFade ?
-			_slideAnimation(this.slidePerView) :
+			_slideAnimation(this.perSlideView) :
 			_slideAnimation(_slideIndex);
 		}
 		else{
@@ -85,7 +85,7 @@ function Slide(node, config){
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
 			!_canFade ?
-			_slideAnimation(-this.slidePerView) :
+			_slideAnimation(-this.perSlideView) :
 			_slideAnimation(_slideIndex);
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
@@ -109,7 +109,7 @@ function Slide(node, config){
 		else{
 			var _delta = num - _slideIndex;
 			_slideIndex = num;
-			_slideAnimation(-_delta * _that.slidePerView);
+			_slideAnimation(-_delta * _that.perSlideView);
 		}
 	};
 
@@ -125,7 +125,7 @@ function Slide(node, config){
 			_li.width(_body.width());
 			_li.height(_body.height());
 		}
-		if(_that.mode === 'horizontal'){
+		if(_that.dir === 'horizontal'){
 			_that.fullPage ?
 			_that.liWidth = _li.width() :
 			_that.block.width(_that.liWidth * _that.perGroup);
@@ -137,7 +137,7 @@ function Slide(node, config){
 			_that.block.height(_that.liHeight * _that.perGroup);
 			_that.list.height(_that.liHeight * _length);
 		}
-		_that.list.addClass('slide-' + _that.mode);
+		_that.list.addClass('slide-' + _that.dir);
 	};
 
 	//初始化分页
@@ -198,7 +198,7 @@ function Slide(node, config){
 			_li.eq(num).fadeIn(300).siblings().fadeOut(300);
 		}
 		else{
-			_that.mode === 'horizontal' ?
+			_that.dir === 'horizontal' ?
 			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed) :
 			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
 		}

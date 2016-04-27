@@ -15,10 +15,10 @@ var mySlide = new Slide('.slide-wrapper', {
 
 | 参数 | 类型 | 默认值 | 可选值 | 含义 | 备注
 | :----: | :----: | :----: | :----: | ----- | ----- |
-| mode | string | 'horizontal' | 'vertical' | 滚动方向（水平或竖直）| |
+| dir | string | 'horizontal' | 'vertical' | 滚动方向（水平或竖直）| 原名'mode'，于V1.4更名|
 | speed | number | 500 | 800 | 滚动速度 | |
 | perGroup | number | 1 | 3 | 显示数量 | |
-| slidePerView | number | 1 | 3 | 每次滚动的数量 | |
+| perSlideView | number | 1 | 3 | 每次滚动的数量 | 原名'slidePerView'，于V1.4更名 |
 | autoPlay | number | 0 | 3000 |自动滚动的时间间隔，大于0时有效 | |
 | pagination | HTML Element | null | '.page' | 分页器 | 单页滚动时有效 |
 | pageClickable | bool | true | false | 分页器是否可点击 | |
