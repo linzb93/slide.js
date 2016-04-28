@@ -41,8 +41,9 @@ function Slide(node, config){
 	_timer = null,
 	_slideIndex = 0,
 	_pageDot = null,
-	_canShowPagination = this.pagination && this.perGroup === 1 && this.perSlideView === 1, //是否展示分页器
-  _canFade = this.fadeInAndOut && this.perGroup === 1 && this.perSlideView === 1,  //是否允许渐隐渐显式轮播
+	_isSinglePage = this.perGroup === 1 && this.perSlideView === 1,  //是否是单页滚动
+	_canShowPagination = this.pagination && _isSinglePage, //是否展示分页器
+  _canFade = this.fadeInAndOut && _isSinglePage,  //是否允许渐隐渐显式轮播
   _that = this;
 	//其他内部变量
 	var _body = $("body");
