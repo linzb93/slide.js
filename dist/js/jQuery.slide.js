@@ -56,6 +56,10 @@ function Slide(node, config){
 		if(_canShowPagination){
 			_createPagination();
 		}
+    //单页状态下复制list头尾两个li元素
+    if(_isSinglePage){
+      _duplicateList();
+    }
 		//自动播放
 		_setAutoPlay();
 		//全屏模式下绑定鼠标滚轮事件
@@ -163,6 +167,18 @@ function Slide(node, config){
 			_pageBind();
 		}
 	};
+
+  var _duplicateList = function(){
+    var firstList = _that.list.eq(0),
+    lastList = _that.list.eq(-1);
+    _that.list.prepend(lastList);
+    _that.list.append(firstList);
+    if(_that.fadeInAndOut){
+      _that.dir === 'horizontal' ?
+      _that.list.css('left', _that.liWidth + 'px') :
+      _that.list.css('top', _that.liHeight + 'px') ;
+    }
+  };
 
 	var _setAutoPlay =function(){
 		if(_that.autoPlay){
