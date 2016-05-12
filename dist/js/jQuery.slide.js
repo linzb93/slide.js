@@ -70,6 +70,7 @@ function Slide(node, config){
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
+		_timer = null;
 		if(_slideIndex > 0){
 			_slideIndex --;
 			!_canFade ?
@@ -83,9 +84,10 @@ function Slide(node, config){
 		}
 	};
 
-	this.slideNext = function(notClear){
-		if(!notClear){
+	this.slideNext = function(){
+		if(_timer !== null){
 			clearInterval(_timer);
+			_timer = null;
 		}
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
@@ -94,18 +96,20 @@ function Slide(node, config){
 			_slideAnimation(_slideIndex);
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
+				_timer = null;
 			}
 		}
 		else{
 			if(this.loop){
-				_slideTo(0, notClear);
+				_slideTo(0);
 			}
 		}
 	};
 
-	var _slideTo = function(num, notClear){
-		if(!notClear){
+	var _slideTo = function(num){
+		if(_timer !== null){
 			clearInterval(_timer);
+			_timer = null;
 		}
 		if(_canFade){
 			_slideIndex = num;
@@ -169,8 +173,8 @@ function Slide(node, config){
 	};
 
   var _duplicateList = function(){
-    var firstList = _that.list.eq(0),
-    lastList = _that.list.eq(-1);
+    var firstList = _li.eq(0),
+    lastList = _li.eq(-1);
     _that.list.prepend(lastList);
     _that.list.append(firstList);
     if(_that.fadeInAndOut){
@@ -183,7 +187,7 @@ function Slide(node, config){
 	var _setAutoPlay =function(){
 		if(_that.autoPlay){
 			_timer = setInterval(function(){
-				_that.slideNext(true);
+				_that.slideNext();
 			}, _that.autoPlay);
 		}
 	};
