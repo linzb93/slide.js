@@ -70,7 +70,6 @@ function Slide(node, config){
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
-		_timer = null;
 		if(_slideIndex > 0){
 			_slideIndex --;
 			!_canFade ?
@@ -79,15 +78,16 @@ function Slide(node, config){
 		}
 		else{
 			if(this.loop){
-				_slideTo(_slideLength - 1);
+				_slideAnimation(-this.perSlideView);
+				_pageDot.eq(-1).addClass('on').siblings().removeClass('on');
+				this.list.css('left', -_that.liWidth * _length + 'px');
 			}
 		}
 	};
 
-	this.slideNext = function(){
-		if(_timer !== null){
+	this.slideNext = function(notClear){
+		if(!notClear){
 			clearInterval(_timer);
-			_timer = null;
 		}
 		if(_slideIndex < _slideLength - 1){
 			_slideIndex ++;
@@ -96,20 +96,23 @@ function Slide(node, config){
 			_slideAnimation(_slideIndex);
 			if(_slideIndex === _slideLength - 1 && !this.loop){
 				clearInterval(_timer);
-				_timer = null;
 			}
 		}
 		else{
 			if(this.loop){
-				_slideTo(0);
+				_slideIndex = 0;
+				_slideAnimation(-this.perSlideView);
+				setTimeout(function(){
+					this.list.css('left', 0);
+				}, 1500);
+				
 			}
 		}
 	};
 
-	var _slideTo = function(num){
-		if(_timer !== null){
+	var _slideTo = function(num, notClear){
+		if(!notClear){
 			clearInterval(_timer);
-			_timer = null;
 		}
 		if(_canFade){
 			_slideIndex = num;
@@ -172,22 +175,29 @@ function Slide(node, config){
 		}
 	};
 
+	//单页状态下复制list头尾两个li元素
   var _duplicateList = function(){
     var firstList = _li.eq(0),
     lastList = _li.eq(-1);
-    _that.list.prepend(lastList);
-    _that.list.append(firstList);
-    if(_that.fadeInAndOut){
+    lastList.clone().prependTo(_that.list);
+    firstList.clone().appendTo(_that.list);
+    if(!_that.fadeInAndOut){
       _that.dir === 'horizontal' ?
-      _that.list.css('left', _that.liWidth + 'px') :
-      _that.list.css('top', _that.liHeight + 'px') ;
+      _that.list.css({
+      	'left': -_that.liWidth + 'px',
+      	'width': _that.liWidth * (_length + 2)
+      }) :
+      _that.list.css({
+      	'top': -_that.liHeight + 'px',
+      	'height': _that.liHeight * (_length + 2)
+      }) ;
     }
   };
 
 	var _setAutoPlay =function(){
 		if(_that.autoPlay){
 			_timer = setInterval(function(){
-				_that.slideNext();
+				_that.slideNext(true);
 			}, _that.autoPlay);
 		}
 	};
