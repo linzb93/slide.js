@@ -58,7 +58,7 @@ function Slide(node, config){
 		}
     //单页状态下复制list头尾两个li元素
     if(_isSinglePage){
-      _duplicateList();
+    	_duplicateList();
     }
 		//自动播放
 		_setAutoPlay();
@@ -78,9 +78,13 @@ function Slide(node, config){
 		}
 		else{
 			if(this.loop){
-				_slideAnimation(-this.perSlideView);
+				_slideAnimation(this.perSlideView);
+				_slideIndex = _slideLength - 1;
 				_pageDot.eq(-1).addClass('on').siblings().removeClass('on');
-				this.list.css('left', -_that.liWidth * _length + 'px');
+				setTimeout(function(){
+					_that.list.css('left', -_that.liWidth * _length + 'px');
+				}, _that.speed + 100)
+
 			}
 		}
 	};
@@ -103,9 +107,10 @@ function Slide(node, config){
 				_slideIndex = 0;
 				_slideAnimation(-this.perSlideView);
 				setTimeout(function(){
-					this.list.css('left', 0);
-				}, 1500);
-				
+					_that.list.css('left', -_that.liWidth);
+				}, _that.speed + 100);
+
+
 			}
 		}
 	};
@@ -176,23 +181,23 @@ function Slide(node, config){
 	};
 
 	//单页状态下复制list头尾两个li元素
-  var _duplicateList = function(){
-    var firstList = _li.eq(0),
-    lastList = _li.eq(-1);
-    lastList.clone().prependTo(_that.list);
-    firstList.clone().appendTo(_that.list);
-    if(!_that.fadeInAndOut){
-      _that.dir === 'horizontal' ?
-      _that.list.css({
-      	'left': -_that.liWidth + 'px',
-      	'width': _that.liWidth * (_length + 2)
-      }) :
-      _that.list.css({
-      	'top': -_that.liHeight + 'px',
-      	'height': _that.liHeight * (_length + 2)
-      }) ;
-    }
-  };
+	var _duplicateList = function(){
+		var firstList = _li.eq(0),
+		lastList = _li.eq(-1);
+		lastList.clone().prependTo(_that.list);
+		firstList.clone().appendTo(_that.list);
+		if(!_that.fadeInAndOut){
+			_that.dir === 'horizontal' ?
+			_that.list.css({
+				'left': -_that.liWidth + 'px',
+				'width': _that.liWidth * (_length + 2)
+			}) :
+			_that.list.css({
+				'top': -_that.liHeight + 'px',
+				'height': _that.liHeight * (_length + 2)
+			}) ;
+		}
+	};
 
 	var _setAutoPlay =function(){
 		if(_that.autoPlay){
