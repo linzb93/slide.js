@@ -84,7 +84,6 @@ function Slide(node, config){
 				setTimeout(function(){
 					_that.list.css('left', -_that.liWidth * _length + 'px');
 				}, _that.speed + 100)
-
 			}
 		}
 	};
@@ -109,8 +108,6 @@ function Slide(node, config){
 				setTimeout(function(){
 					_that.list.css('left', -_that.liWidth);
 				}, _that.speed + 100);
-
-
 			}
 		}
 	};
@@ -234,9 +231,16 @@ function Slide(node, config){
 			_li.eq(num).fadeIn(300).siblings().fadeOut(300);
 		}
 		else{
-			_that.dir === 'horizontal' ?
-			_that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed) :
-			_that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed);
+      if(_that.dir === 'horizontal'){
+        _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed, function(){
+          if(){}
+        });
+      }
+			else{
+        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function(){
+          if(){}
+        });
+      }
 		}
 		if(_canShowPagination){
 			_paginationChange();
