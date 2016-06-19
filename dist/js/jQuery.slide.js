@@ -8,7 +8,6 @@ function Slide(node, config){
 		perGroup: 1,  //显示数量
 		perSlideView: 1,  //每次滚动的数量
 		autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
-		loop: true,  //是否循环滚动
 		pagination: null,  //分页器
 		outerPagination: false,  //是否是外部的分页器
 		pageClickable: true,  //分页器是否可点击
@@ -23,7 +22,6 @@ function Slide(node, config){
 	this.perGroup = defaultPara.perGroup,
 	this.perSlideView = defaultPara.perSlideView,
 	this.autoPlay = defaultPara.autoPlay,
-	this.loop = defaultPara.loop,
 	this.pagination = $(defaultPara.pagination),
 	this.outerPagination = defaultPara.outerPagination,
 	this.pageClickable = defaultPara.pageClickable,
@@ -39,7 +37,7 @@ function Slide(node, config){
 	var	_length = _li.length,
 	_slideLength = Math.ceil((_length - this.perGroup) / this.perSlideView) + 1,
 	_timer = null,
-	_slideIndex = 0,
+	_counter = 0,
 	_pageDot = null,
 	_isSinglePage = this.perGroup === 1 && this.perSlideView === 1,  //是否是单页滚动
 	_canShowPagination = this.pagination && _isSinglePage, //是否展示分页器
@@ -60,7 +58,7 @@ function Slide(node, config){
     if(_isSinglePage){
     	_duplicateList();
     }
-		//自动播放
+		//默认自动播放
 		_setAutoPlay();
 		//全屏模式下绑定鼠标滚轮事件
 		if(_that.fullPage){
@@ -70,21 +68,15 @@ function Slide(node, config){
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
-		if(_slideIndex > 0){
-			_slideIndex --;
+		if(_counter >= 0){
 			!_canFade ?
 			_slideAnimation(this.perSlideView) :
-			_slideAnimation(_slideIndex);
+			_slideFade(_counter - 1);
 		}
 		else{
-			if(this.loop){
 				_slideAnimation(this.perSlideView);
-				_slideIndex = _slideLength - 1;
+				_counter = _slideLength - 1;
 				_pageDot.eq(-1).addClass('on').siblings().removeClass('on');
-				setTimeout(function(){
-					_that.list.css('left', -_that.liWidth * _length + 'px');
-				}, _that.speed + 100)
-			}
 		}
 	};
 
@@ -92,23 +84,14 @@ function Slide(node, config){
 		if(!notClear){
 			clearInterval(_timer);
 		}
-		if(_slideIndex < _slideLength - 1){
-			_slideIndex ++;
+		if(_counter <= _slideLength - 1){
 			!_canFade ?
 			_slideAnimation(-this.perSlideView) :
-			_slideAnimation(_slideIndex);
-			if(_slideIndex === _slideLength - 1 && !this.loop){
-				clearInterval(_timer);
-			}
+			_slideFade(_counter + 1);
 		}
 		else{
-			if(this.loop){
-				_slideIndex = 0;
+				_counter = 0;
 				_slideAnimation(-this.perSlideView);
-				setTimeout(function(){
-					_that.list.css('left', -_that.liWidth);
-				}, _that.speed + 100);
-			}
 		}
 	};
 
@@ -117,12 +100,12 @@ function Slide(node, config){
 			clearInterval(_timer);
 		}
 		if(_canFade){
-			_slideIndex = num;
-			_slideAnimation(_slideIndex);
+			_counter = num;
+			_slideFade(_counter);
 		}
 		else{
-			var _delta = num - _slideIndex;
-			_slideIndex = num;
+			var _delta = num - _counter;
+			_counter = num;
 			_slideAnimation(-_delta * _that.perSlideView);
 		}
 	};
@@ -206,7 +189,7 @@ function Slide(node, config){
 
 	//分页器变换
 	var _paginationChange = function(){
-		_pageDot.eq(_slideIndex).addClass('on').siblings().removeClass('on');
+		_pageDot.eq(_counter).addClass('on').siblings().removeClass('on');
 	};
 
 	//绑定分页器事件
@@ -227,25 +210,43 @@ function Slide(node, config){
 
 	//执行滚动
 	var _slideAnimation = function(num){
-		if(_canFade){
-			_li.eq(num).fadeIn(300).siblings().fadeOut(300);
-		}
-		else{
-      if(_that.dir === 'horizontal'){
-        _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed, function(){
-          if(){}
-        });
-      }
-			else{
-        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function(){
-          if(){}
-        });
-      }
-		}
-		if(_canShowPagination){
-			_paginationChange();
-		}
-	};
+    if(_that.dir === 'horizontal'){
+      _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed, function(){
+        if(num > 0){
+          _counter --;
+        }
+        else{
+          _counter ++;
+        }
+        console.log(_counter);
+        if(_counter === -1){
+          _that.list.css('left', -_that.liWidth * _length + 'px');
+        }
+        else if(_counter === _length){
+          _that.list.css('left', -_that.liWidth);
+        };
+      });
+    }
+    else{
+      _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function(){
+      //  if(){}
+      });
+    }
+    if(_canShowPagination){
+     _paginationChange();
+   }
+ };
 
-	_init();
+  //执行渐隐渐显式播放
+  var _slideFade = function(num){
+    _li.eq(num).fadeIn(300, function(){
+      _counter = num;
+    }).siblings().fadeOut(300);
+    console.log(_counter);
+    if(_canShowPagination){
+      _paginationChange();
+    }
+  };
+
+  _init();
 }
