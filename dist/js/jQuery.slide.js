@@ -218,7 +218,6 @@ function Slide(node, config){
         else{
           _counter ++;
         }
-        console.log(_counter);
         if(_counter === -1){
           _that.list.css('left', -_that.liWidth * _length + 'px');
         }
@@ -229,7 +228,18 @@ function Slide(node, config){
     }
     else{
       _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function(){
-      //  if(){}
+      if(num > 0){
+          _counter --;
+        }
+        else{
+          _counter ++;
+        }
+        if(_counter === -1){
+          _that.list.css('top', -_that.liHeight * _length + 'px');
+        }
+        else if(_counter === _length){
+          _that.list.css('top', -_that.liHeight);
+        };
       });
     }
     if(_canShowPagination){
@@ -241,6 +251,12 @@ function Slide(node, config){
   var _slideFade = function(num){
     _li.eq(num).fadeIn(300, function(){
       _counter = num;
+      if(_counter === -1){
+        _counter = _length - 1;
+      }
+      // else if(_counter === _length){
+      //   _counter = 0;
+      // }
     }).siblings().fadeOut(300);
     console.log(_counter);
     if(_canShowPagination){

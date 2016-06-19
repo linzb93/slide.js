@@ -33,7 +33,8 @@
 	$(function(){
 		var mySlide1 = new Slide(".slide .slide-wrapper", {
 			autoPlay: 2000,
-			pagination: '.page'
+			pagination: '.page',
+			fadeInAndOut: true
 		});
 		$(".slide .prev").click(function(){
 			mySlide1.slidePrev();
