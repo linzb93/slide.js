@@ -55,7 +55,7 @@ function Slide(node, config){
 			_createPagination();
 		}
     //单页状态下复制list头尾两个li元素
-    if(_isSinglePage){
+    if(_isSinglePage  && !_that.fadeInAndOut){
     	_duplicateList();
     }
 		//默认自动播放
@@ -175,8 +175,10 @@ function Slide(node, config){
 			_that.list.css({
 				'top': -_that.liHeight + 'px',
 				'height': _that.liHeight * (_length + 2)
-			}) ;
+			});
 		}
+		_that.list.find('li').eq(0).addClass('slide-duplicate').end()
+		.eq(-1).addClass('slide-duplicate');
 	};
 
 	var _setAutoPlay =function(){
@@ -224,6 +226,9 @@ function Slide(node, config){
         else if(_counter === _length){
           _that.list.css('left', -_that.liWidth);
         };
+        if(_canShowPagination){
+     			_paginationChange();
+   			}
       });
     }
     else{
@@ -240,11 +245,11 @@ function Slide(node, config){
         else if(_counter === _length){
           _that.list.css('top', -_that.liHeight);
         };
+        if(_canShowPagination){
+     			_paginationChange();
+   			}
       });
     }
-    if(_canShowPagination){
-     _paginationChange();
-   }
  };
 
   //执行渐隐渐显式播放
@@ -254,14 +259,13 @@ function Slide(node, config){
       if(_counter === -1){
         _counter = _length - 1;
       }
-      // else if(_counter === _length){
-      //   _counter = 0;
-      // }
-    }).siblings().fadeOut(300);
-    console.log(_counter);
-    if(_canShowPagination){
+      else if(_counter === _length - 1){
+        _counter = -1;
+      }
+      if(_canShowPagination){
       _paginationChange();
     }
+    }).siblings().fadeOut(300);
   };
 
   _init();
