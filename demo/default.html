@@ -33,13 +33,12 @@
 	$(function(){
 		var mySlide1 = new Slide(".slide .slide-wrapper", {
 			autoPlay: 2000,
-			pagination: '.page',
-			fadeInAndOut: true
+			pagination: '.page'
 		});
-		$(".slide .prev").click(function(){
+		$(".prev").on('click', function(){
 			mySlide1.slidePrev();
 		})
-		$(".slide .next").click(function() {
+		$(".next").on('click', function() {
 			mySlide1.slideNext();
 		});
 	});
