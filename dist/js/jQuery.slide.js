@@ -28,7 +28,7 @@ function Slide(node, config){
 	this.fullPage = defaultPara.fullPage,
 	this.showPageNum = defaultPara.showPageNum,
 	this.fadeInAndOut = defaultPara.fadeInAndOut;
-	//考虑到animate()方法而不得不暴露的变量
+	//考虑到animate()方法而暴露的变量
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
 	this.liWidth = _li.width(),
@@ -40,7 +40,7 @@ function Slide(node, config){
 	_counter = 0,
 	_pageDot = null,
 	_isSinglePage = this.perGroup === 1 && this.perSlideView === 1,  //是否是单页滚动
-	_canShowPagination = this.pagination && _isSinglePage, //是否展示分页器
+	_canShowPagination = this.pagination && _isSinglePage,  //是否展示分页器
   _canFade = this.fadeInAndOut && _isSinglePage,  //是否允许渐隐渐显式轮播
   _that = this;
 	//其他内部变量
@@ -224,6 +224,7 @@ function Slide(node, config){
           _that.list.css('left', -_that.liWidth * _length + 'px');
         }
         else if(_counter === _length){
+        	_counter = 0;
           _that.list.css('left', -_that.liWidth);
         };
         if(_canShowPagination){
@@ -243,6 +244,7 @@ function Slide(node, config){
           _that.list.css('top', -_that.liHeight * _length + 'px');
         }
         else if(_counter === _length){
+        	_counter = 0;
           _that.list.css('top', -_that.liHeight);
         };
         if(_canShowPagination){
