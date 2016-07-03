@@ -38,7 +38,8 @@ function Slide(node, config){
 	_slideLength = Math.ceil((_length - this.perGroup) / this.perSlideView) + 1,
 	_timer = null,
 	_counter = 0,
-	_pageDot = null,
+  _curPos = 0, //滑动播放时当前位置
+  _pageDot = null,
 	_isSinglePage = this.perGroup === 1 && this.perSlideView === 1,  //是否是单页滚动
 	_canShowPagination = this.pagination && _isSinglePage,  //是否展示分页器
   _canFade = this.fadeInAndOut && _isSinglePage,  //是否允许渐隐渐显式轮播
@@ -68,47 +69,64 @@ function Slide(node, config){
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
-		if(_counter >= 0){
-			!_canFade ?
-			_slideAnimation(this.perSlideView) :
-			_slideFade(_counter - 1);
-		}
-		else{
-				_slideAnimation(this.perSlideView);
-				_counter = _slideLength - 1;
-				_pageDot.eq(-1).addClass('on').siblings().removeClass('on');
-		}
-	};
+    if(_canFade){
+      if(_counter >= 0){
+        _slideFade(_counter - 1);
+      }
+      else{
+       _counter = _slideLength - 1;
+       _pageDot.eq(-1).addClass('on').siblings().removeClass('on');
+     }
+   }
+   else{
+    if(_curPos){
+      var _nextPos = _curPos + (this.dir === 'horizontal' ? this.liWidth : this.liHeight) * this.perSlideView;
+      _slideAnimation(_nextPos);
+    }
+    else{
+      _slideAnimation(0);
+      _pageDot.eq(-1).addClass('on').siblings().removeClass('on');
+    }
+  }
+};
 
-	this.slideNext = function(notClear){
-		if(!notClear){
-			clearInterval(_timer);
-		}
-		if(_counter <= _slideLength - 1){
-			!_canFade ?
-			_slideAnimation(-this.perSlideView) :
-			_slideFade(_counter + 1);
-		}
-		else{
-				_counter = 0;
-				_slideAnimation(-this.perSlideView);
-		}
-	};
+this.slideNext = function(notClear){
+  if(!notClear){
+   clearInterval(_timer);
+ }
+ if(_canFade){
+   if(_counter <= _slideLength - 1){
+    _slideFade(_counter + 1);
+   }
+   else{
+    _counter = 0;
+   }
+ }
+ else{
+  if(_curPos < (_length - 1) * this.liWidth){
+    var _nextPos = _curPos - (this.dir === 'horizontal' ? this.liWidth : this.liHeight) * this.perSlideView;
+    _slideAnimation(_nextPos);
+  }
+  else{
+    _slideAnimation((this.dir === 'horizontal' ? this.liWidth : this.liHeight) * _slideLength);
+  }
+ }
+};
 
-	var _slideTo = function(num, notClear){
-		if(!notClear){
-			clearInterval(_timer);
-		}
-		if(_canFade){
-			_counter = num;
-			_slideFade(_counter);
-		}
-		else{
-			var _delta = num - _counter;
-			_counter = num;
-			_slideAnimation(-_delta * _that.perSlideView);
-		}
-	};
+var _slideTo = function(num, notClear){
+  if(!notClear){
+   clearInterval(_timer);
+ }
+ if(_canFade){
+   _counter = num;
+   _slideFade(_counter);
+ }
+ else{
+   var _nextPos = (num + 1) * (this.dir === 'horizontal' ? this.liWidth : this.liHeight);
+   _counter = num;
+   _slideAnimation(_nextPos);
+ }
+};
 
 	//初始化样式
 	var _setStyle = function(){
@@ -166,28 +184,31 @@ function Slide(node, config){
 		lastList = _li.eq(-1);
 		lastList.clone().prependTo(_that.list);
 		firstList.clone().appendTo(_that.list);
-		if(!_that.fadeInAndOut){
-			_that.dir === 'horizontal' ?
+		if(_that.dir === 'horizontal'){
 			_that.list.css({
 				'left': -_that.liWidth + 'px',
 				'width': _that.liWidth * (_length + 2)
-			}) :
-			_that.list.css({
-				'top': -_that.liHeight + 'px',
-				'height': _that.liHeight * (_length + 2)
 			});
-		}
-		_that.list.find('li').eq(0).addClass('slide-duplicate').end()
-		.eq(-1).addClass('slide-duplicate');
-	};
+      _curPos = -_that.liWidth;
+    }
+    else{
+     _that.list.css({
+      'top': -_that.liHeight + 'px',
+      'height': _that.liHeight * (_length + 2)
+    });
+     _curPos = -_that.liHeight;
+   }
+   _that.list.find('li').eq(0).addClass('slide-duplicate').end()
+   .eq(-1).addClass('slide-duplicate');
+ };
 
-	var _setAutoPlay =function(){
-		if(_that.autoPlay){
-			_timer = setInterval(function(){
-				_that.slideNext(true);
-			}, _that.autoPlay);
-		}
-	};
+ var _setAutoPlay =function(){
+  if(_that.autoPlay){
+   _timer = setInterval(function(){
+    _that.slideNext(true);
+  }, _that.autoPlay);
+ }
+};
 
 	//分页器变换
 	var _paginationChange = function(){
@@ -211,48 +232,55 @@ function Slide(node, config){
 	};
 
 	//执行滚动
-	var _slideAnimation = function(num){
+	var _slideAnimation = function(nextPos){
+    var _slideDir = nextPos - _curPos;
     if(_that.dir === 'horizontal'){
-      _that.list.animate({left: '+=' + num * _that.liWidth + 'px'}, _that.speed, function(){
-        if(num > 0){
+      _that.list.animate({left: nextPos + 'px'}, _that.speed, function(){
+        if(_slideDir > 0){
           _counter --;
         }
         else{
           _counter ++;
         }
+        _curPos = nextPos;
         if(_counter === -1){
           _that.list.css('left', -_that.liWidth * _length + 'px');
+          _curPos = -_that.liWidth * _length;
         }
         else if(_counter === _length){
         	_counter = 0;
           _that.list.css('left', -_that.liWidth);
+          _curPos = -_that.liWidth;
         };
         if(_canShowPagination){
-     			_paginationChange();
-   			}
+          _paginationChange();
+        }
       });
     }
     else{
-      _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function(){
-      if(num > 0){
+      _that.list.animate({top: nextPos + 'px'}, _that.speed, function(){
+        if(_slideDir > 0){
           _counter --;
         }
         else{
           _counter ++;
         }
+        _curPos = nextPos;
         if(_counter === -1){
           _that.list.css('top', -_that.liHeight * _length + 'px');
+          _curPos = -_that.liWidth * _length;
         }
         else if(_counter === _length){
         	_counter = 0;
           _that.list.css('top', -_that.liHeight);
+          _curPos = -_that.liWidth;
         };
         if(_canShowPagination){
-     			_paginationChange();
-   			}
+          _paginationChange();
+        }
       });
     }
- };
+  };
 
   //执行渐隐渐显式播放
   var _slideFade = function(num){
@@ -265,8 +293,8 @@ function Slide(node, config){
         _counter = -1;
       }
       if(_canShowPagination){
-      _paginationChange();
-    }
+        _paginationChange();
+      }
     }).siblings().fadeOut(300);
   };
 
