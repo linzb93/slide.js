@@ -33,6 +33,7 @@ function Slide(node, config){
 	var _li = this.list.find('li');
 	this.liWidth = _li.width(),
 	this.liHeight = _li.height();
+  this.liSize = this.dir === 'horizontal' ? this.liWidth : this.liHeight;
 	//与轮播直接相关的内部变量
 	var	_length = _li.length,
 	_slideLength = Math.ceil((_length - this.perGroup) / this.perSlideView) + 1,
@@ -56,7 +57,7 @@ function Slide(node, config){
 			_createPagination();
 		}
     //单页状态下复制list头尾两个li元素
-    if(_isSinglePage  && !_that.fadeInAndOut){
+    if(_isSinglePage  && !_that.fadeInAndOut && !_that.fullPage){
     	_duplicateList();
     }
 		//默认自动播放
@@ -69,64 +70,118 @@ function Slide(node, config){
 
 	this.slidePrev = function(){
 		clearInterval(_timer);
+    if(!_isSinglePage){
+     _carouselHandler('prev');
+    }
+    else if(_canFade){
+      _fadeHandler('prev');
+    }
+    else{
+      if(_that.fullPage && _counter === -1){
+        return;
+      }
+      _singlePageHandler('prev');
+    }
+  };
+
+  this.slideNext = function(notClear){
+    if(!notClear){
+      clearInterval(_timer);
+    }
+    if(!_isSinglePage){
+      _carouselHandler('next');
+    }
+    else if(_canFade){
+      _fadeHandler('next');
+    }
+    else{
+      if(_that.fullPage && _counter === _length - 2){
+        return;
+      }
+      _singlePageHandler('next');
+    }
+  };
+
+  var _slideTo = function(num, notClear){
+    if(!notClear){
+      clearInterval(_timer);
+    }
     if(_canFade){
+      _counter = num;
+      _slideFade(_counter + 1);
+    }
+    else{
+      var _nextPos = -(num + 2) * (_that.dir === 'horizontal' ? _that.liWidth : _that.liHeight);
+      _slideAnimation(_nextPos);
+    }
+  };
+
+  //处理单页滚动
+  var _singlePageHandler = function(btnDir){
+    if(btnDir === 'prev'){
+      if(_curPos){
+        var _nextPos = _curPos + _that.liSize;
+        _slideAnimation(_nextPos);
+      }
+      else{
+        _slideAnimation(0);
+        _pageDot.eq(-1).onlyClass('on');
+      }
+    }
+    else if(btnDir === 'next'){
+      if(_curPos < (_length - 1) * _that.liWidth){
+        var _nextPos = _curPos - _that.liSize;
+        _slideAnimation(_nextPos);
+      }
+      else{
+        _slideAnimation(_that.liSize * _length);
+      }
+    }
+  }
+
+  //处理多页滚动
+  var _carouselHandler = function(btnDir){
+    if(btnDir === 'prev'){
+      if(_curPos === 0){
+        _curPos = -(_slideLength - 1) * _that.perGroup * _that.liSize;
+        _slideCarousel(_curPos);
+      }
+      else{
+        var _nextPos = _curPos + _that.liSize * _that.perSlideView;
+        _curPos = _nextPos;
+        _slideCarousel(_nextPos);
+      }
+    }
+    else if(btnDir === 'next'){
+      if(_curPos === -(_slideLength - 1) * _that.perGroup * _that.liSize){
+        _curPos = 0;
+        _slideCarousel(0);
+      }
+      else{
+        var _nextPos = _curPos - _that.liSize * _that.perSlideView;
+        _curPos = _nextPos;
+        _slideCarousel(_nextPos);
+      }
+    }
+  }
+
+  //处理渐隐渐显式轮播
+  var _fadeHandler = function(btnDir){
+    if(btnDir === 'prev'){
       if(_counter >= 0){
         _slideFade(_counter - 1);
       }
       else{
-       _counter = _slideLength - 1;
-       _pageDot.eq(-1).addClass('on').siblings().removeClass('on');
-     }
-   }
-   else{
-    if(_curPos){
-      var _nextPos = _curPos + (this.dir === 'horizontal' ? this.liWidth : this.liHeight) * this.perSlideView;
-      _slideAnimation(_nextPos);
+        _counter = _slideLength - 1;
+        _pageDot.eq(-1).onlyClass('on');
+      }
     }
-    else{
-      _slideAnimation(0);
-      _pageDot.eq(-1).addClass('on').siblings().removeClass('on');
+    else if(btnDir === 'next'){
+      _counter <= _slideLength - 1 ?
+      _slideFade(_counter + 1):
+      _counter = 0;
     }
   }
-};
-
-this.slideNext = function(notClear){
-  if(!notClear){
-   clearInterval(_timer);
- }
- if(_canFade){
-   if(_counter <= _slideLength - 1){
-    _slideFade(_counter + 1);
-   }
-   else{
-    _counter = 0;
-   }
- }
- else{
-  if(_curPos < (_length - 1) * this.liWidth){
-    var _nextPos = _curPos - (this.dir === 'horizontal' ? this.liWidth : this.liHeight) * this.perSlideView;
-    _slideAnimation(_nextPos);
-  }
-  else{
-    _slideAnimation((this.dir === 'horizontal' ? this.liWidth : this.liHeight) * _slideLength);
-  }
- }
-};
-
-var _slideTo = function(num, notClear){
-  if(!notClear){
-   clearInterval(_timer);
- }
- if(_canFade){
-   _counter = num;
-   _slideFade(_counter);
- }
- else{
-   var _nextPos = (num + 1) * (this.dir === 'horizontal' ? this.liWidth : this.liHeight);
-   _counter = num;
-   _slideAnimation(_nextPos);
- }
-};
 
 	//初始化样式
 	var _setStyle = function(){
@@ -139,6 +194,9 @@ var _slideTo = function(num, notClear){
 		if (_that.fullPage) {
 			_li.width(_body.width());
 			_li.height(_body.height());
+      _that.liWidth = _li.width();
+      _that.liHeight = _li.height();
+      _that.liSize = _that.dir === 'horizontal' ? _that.liWidth : _that.liHeight;
 		}
 		if(_that.dir === 'horizontal'){
 			_that.fullPage ?
@@ -192,33 +250,33 @@ var _slideTo = function(num, notClear){
       _curPos = -_that.liWidth;
     }
     else{
-     _that.list.css({
-      'top': -_that.liHeight + 'px',
-      'height': _that.liHeight * (_length + 2)
-    });
-     _curPos = -_that.liHeight;
-   }
-   _that.list.find('li').eq(0).addClass('slide-duplicate').end()
-   .eq(-1).addClass('slide-duplicate');
- };
+      _that.list.css({
+        'top': -_that.liHeight + 'px',
+        'height': _that.liHeight * (_length + 2)
+      });
+      _curPos = -_that.liHeight;
+    }
+    _that.list.find('li').eq(0).addClass('slide-duplicate').end()
+    .eq(-1).addClass('slide-duplicate');
+  };
 
- var _setAutoPlay =function(){
-  if(_that.autoPlay){
-   _timer = setInterval(function(){
-    _that.slideNext(true);
-  }, _that.autoPlay);
- }
-};
+  var _setAutoPlay =function(){
+    if(_that.autoPlay){
+      _timer = setInterval(function(){
+        _that.slideNext(true);
+      }, _that.autoPlay);
+    }
+  };
 
 	//分页器变换
 	var _paginationChange = function(){
-		_pageDot.eq(_counter).addClass('on').siblings().removeClass('on');
+		_pageDot.eq(_counter).onlyClass('on');
 	};
 
 	//绑定分页器事件
 	var _pageBind = function(){
 		_pageDot.on('click', function(){
-			_slideTo($(this).index());
+			_slideTo($(this).index() - 1);
 		});
 	};
 
@@ -233,51 +291,54 @@ var _slideTo = function(num, notClear){
 
 	//执行滚动
 	var _slideAnimation = function(nextPos){
-    var _slideDir = nextPos - _curPos;
     if(_that.dir === 'horizontal'){
       _that.list.animate({left: nextPos + 'px'}, _that.speed, function(){
-        if(_slideDir > 0){
-          _counter --;
-        }
-        else{
-          _counter ++;
-        }
+        _counter = -nextPos / _that.liWidth - 1;
         _curPos = nextPos;
+        if(_canShowPagination){
+          _paginationChange();
+        }
+        if(_that.fullPage && (_counter === -1 || _counter === _length)){
+          return;
+        }
         if(_counter === -1){
           _that.list.css('left', -_that.liWidth * _length + 'px');
           _curPos = -_that.liWidth * _length;
         }
         else if(_counter === _length){
-        	_counter = 0;
+          _counter = 0;
           _that.list.css('left', -_that.liWidth);
           _curPos = -_that.liWidth;
-        };
-        if(_canShowPagination){
+          if(_canShowPagination){
           _paginationChange();
         }
+        };
       });
     }
     else{
       _that.list.animate({top: nextPos + 'px'}, _that.speed, function(){
-        if(_slideDir > 0){
-          _counter --;
-        }
-        else{
-          _counter ++;
-        }
+        _counter = -nextPos / _that.liHeight - 1;
         _curPos = nextPos;
+        if(_that.fullPage){
+          if(_canShowPagination){
+            _paginationChange();
+          }
+          if(_counter === -1 || _counter === _length){
+            return;
+          }
+        }
         if(_counter === -1){
           _that.list.css('top', -_that.liHeight * _length + 'px');
-          _curPos = -_that.liWidth * _length;
+          _curPos = -_that.liHeight * _length;
         }
         else if(_counter === _length){
         	_counter = 0;
           _that.list.css('top', -_that.liHeight);
-          _curPos = -_that.liWidth;
-        };
-        if(_canShowPagination){
+          _curPos = -_that.liHeight;
+          if(_canShowPagination){
           _paginationChange();
         }
+        };
       });
     }
   };
@@ -297,6 +358,17 @@ var _slideTo = function(num, notClear){
       }
     }).siblings().fadeOut(300);
   };
+
+  //执行多页滚动
+  var _slideCarousel = function(nextPos){
+    _that.dir === 'horizontal' ?
+    _that.list.animate({left: nextPos + 'px'}, _that.speed) :
+    _that.list.animate({top: nextPos + 'px'}, _that.speed) ;
+  };
+
+  $.fn.onlyClass = function(cls){
+    return $(this).addClass(cls).siblings().removeClass(cls);
+  }
 
   _init();
 }
