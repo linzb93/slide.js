@@ -1,10 +1,14 @@
-#jQuery-slide.js更新日志
+#jQuery.slide.js更新日志
+
 V1.4
 ---
-###2016年6月26日
-- 
-- 移除loop参数
+###2016年7月10日
+- 优化单页滚动的体验
 - 删除sass文件
+- 删除jQuery文件，改用jQuery CDN
+- 删除jQuery.slide.min.js
+- 移除loop参数
+- mode参数更名为dir，perSlideView参数名称不变
 
 V1.3
 ---
@@ -15,7 +19,7 @@ V1.3
 - 优化代码，删除无用方法
 - SlideTo()方法不再对外公开
 - 修复文档描述错误
-- 为规范参数名称，便于记忆，有两个参数将在下个版本更名，分别是mode和perSlideView，mode更名为dir，perSlideView更名为slidePerView,还望周知
+- 为规范参数名称，便于记忆，mode参数更名为dir，还望周知
 - jQuery-slide.js 2.0版已在开发中。2.0版将采用jQuery插件最常用的挂在jQuery原型下的方式。如果2.0版开发成功，1.x版将不再维护
 
 V1.2
