@@ -27,14 +27,14 @@
 		<a href="javascript:;" title="" class="next">></a>
 		<div class="page"></div>
 	</div>
-	<script src="../dist/js/jquery-1.8.0.min.js"></script>
+	<script src="http://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
 	<script src="../dist/js/jQuery.slide.js"></script>
 	<script>
 	$(function(){
 		var mySlide1 = new Slide(".slide .slide-wrapper", {
 			pagination: '.page',
 			perGroup: 3,
-			slidePerView: 2
+			perSlideView: 2
 		});
 		$(".slide .prev").click(function(){
 			mySlide1.slidePrev();
