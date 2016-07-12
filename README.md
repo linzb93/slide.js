@@ -56,6 +56,7 @@ $rightBtn.on('click', function(){
 });
 ```
 ##其他
+
 其他参数列表会在[API.md](https://github.com/linzb93/slide/blob/master/doc/API.md)里面展现，这里不再重复。
 
 _注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的。
