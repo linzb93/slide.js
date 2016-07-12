@@ -7,8 +7,6 @@
     outerPagination: false
   };
   var pageDot,slideLength;
-
-
   function init(options){
     var o = $.extend(true, {}, d, options);
     var that = this;
