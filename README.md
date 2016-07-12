@@ -1,5 +1,5 @@
 # 关于 jQuery.slide.js
-[![release](https://img.shields.io/badge/release-v1.4-orange.svg)](https://github.com/linzb93/jQuery.slide.js/releases) [![issues](https://img.shields.io/github/issues/linzb93/jQuery.slide.js.svg)](https://github.com/linzb93/jQuery.slide.js/issues) [![forks](https://img.shields.io/github/forks/linzb93/jQuery.slide.js.svg)](https://github.com/linzb93/jQuery.slide.js/network) [![stars](https://img.shields.io/github/stars/linzb93/jQuery.slide.js.svg)](https://github.com/linzb93/jQuery.slide.js/stargazers) [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/linzb93/jQuery.slide.js/blob/master/LICENSE)
+
 ##简介
 jQuery.slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比，jQuery.slide.js体积较小，节省浏览器的解析时间，并且拥有Swiper的多数常用功能。
 
@@ -56,6 +56,6 @@ $rightBtn.on('click', function(){
 });
 ```
 ##其他
-其他参数列表会在[API.md](https://github.com/linzb93/slide/blob/master/API.md)里面展现，这里不再重复。
+其他参数列表会在[API.md](https://github.com/linzb93/slide/blob/master/doc/API.md)里面展现，这里不再重复。
 
-_注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的，也可以下载压缩版jQuery.slide.min.js。_
+_注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的。
