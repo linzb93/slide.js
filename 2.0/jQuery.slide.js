@@ -1,4 +1,4 @@
-(function($, window, undefined){
+(function($){
   var d = {
     speed: 500,
     pagination: null,
@@ -8,10 +8,10 @@
   };
   var pageDot,slideLength;
   function init(options){
-    var o = $.extend(true, {}, d, options);
+    var o = $.extend(d, options);
     var that = this;
     that.o = o;
-    that.block = $(this);
+    that.block = that.$this;
     that.speed = that.o.speed;
     that.pagination = $(that.o.pagination);
     that.autoPlay = that.o.autoPlay;
@@ -23,14 +23,13 @@
     that.liWidth = that.li.width();
     that.block.width(that.liWidth);
     that.list.width(that.liWidth * slideLength);
-    console.log($(this))
     that.createPagination();
     that.pageClick();
     that.setAutoPlay();
   }
-function Slide($this, options){
+  function Slide($this, options){
     this.$this = $this;
-        init.call(this, options);
+    init.call(this, options);
   }
   $.extend(Slide.prototype, {
     createPagination: function(){
@@ -56,22 +55,24 @@ function Slide($this, options){
       }
     },
     setAutoPlay: function(){
+      var that = this;
       if(this.autoPlay){
         setInterval(function(){
-          this.slideNext();
+          that.slideNext();
         }, this.autoPlay);
       }
     },
     slideNext: function(){
-      SlideAnimation(-1);
+      this.SlideAnimation(-1);
     },
+    slideTo: function(){},
     SlideAnimation: function(num){
       this.list.animate({
-        left: num * this.liWidth + 'px'
+        left: '+=' + num * this.liWidth + 'px'
       }, this.speed);
     }
   });
   $.fn.slide = function(options){
     new Slide($(this), options);
   };
-}(jQuery, window))
+}(jQuery))

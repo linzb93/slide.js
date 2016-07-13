@@ -5,15 +5,18 @@
 <title>Default</title>
 <link rel="stylesheet" type="text/css" href="../dist/css/common.css">
 <style>
-	li{width: 700px;height: 300px;}
+.slide2{position: absolute;left: 300px;top: 500px;}
+ul{left: 0;position: relative;}
+	li{width: 700px;height: 300px;float: left;}
 	li div{font-size: 80px;}
+	.clearfix:after{ content:""; height:0; visibility:hidden; display:block; clear:both;}
 </style>
 <link rel="stylesheet" type="text/css" href="../dist/css/jQuery.slide.css">
 </head>
 <body>
 	<div class="slide">
 		<div class="slide-wrapper">
-			<ul>
+			<ul class="clearfix">
 				<li><div class="orange">Slide 1</div></li>
 				<li><div class="green">Slide 2</div></li>
 				<li><div class="blue">Slide 3</div></li>
@@ -27,11 +30,25 @@
 		<a href="javascript:;" title="" class="next">></a>
 		<div class="page"></div>
 	</div>
+	<div class="slide2">
+		<div class="slide-wrapper">
+			<ul class="clearfix">
+				<li><div class="orange">Slide 1</div></li>
+				<li><div class="green">Slide 2</div></li>
+				<li><div class="blue">Slide 3</div></li>
+				<li><div class="orange">Slide 4</div></li>
+				<li><div class="green">Slide 5</div></li>
+			</ul>
+		</div>
+		<a href="javascript:;" title="" class="prev"><</a>
+		<a href="javascript:;" title="" class="next">></a>
+		<div class="page"></div>
+	</div>
 	<script src="http://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
-	<script src="../dist/js/jQuery.slide.js"></script>
+	<script src="../2.0/jQuery.slide.js"></script>
 	<script>
 	$(function(){
-		var mySlide1 = new Slide(".slide .slide-wrapper", {
+		/*var mySlide1 = new Slide(".slide .slide-wrapper", {
 			autoPlay: 2000,
 			pagination: '.page'
 		});
@@ -40,6 +57,12 @@
 		})
 		$(".next").on('click', function() {
 			mySlide1.slideNext();
+		});*/
+		$(".slide .slide-wrapper").slide({
+			autoPlay: 2000
+		});
+		$(".slide2 .slide-wrapper").slide({
+			autoPlay: 4000
 		});
 	});
 	</script>
