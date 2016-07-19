@@ -1,21 +1,21 @@
 (function($){
     var d = {
-        speed: 500,
-        pagination: null,
-        autoPlay: 0,
-        paginationType: 'dot'
+        dir: 'horizontal',  //滚动方向（水平或竖直）
+        speed: 500,  //滚动速度
+        effect: 'slide',  //效果
+        perGroup: 1,  //显示数量
+        perSlideView: 1,  //每次滚动的数量
+        autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
+        pagination: null,  //分页器
+        paginationType: 'dot'  //分页器类型
     };
     var pageChild,slideLength;
     function init(options){
         var o = $.extend(d, options);
         var that = this;
         that.o = o;
-        that.block = that.$this;
-        that.speed = that.o.speed;
-        that.pagination = $(that.o.pagination);
-        that.autoPlay = that.o.autoPlay;
-        that.pageClickable = that.o.pageClickable;
-        that.outerPagination = that.o.outerPagination;
+        that.block = that.$this,
+        that.pagination = $(that.o.pagination),
         that.list = that.block.find('ul');
         that.li = that.list.find('li');
         slideLength = that.li.length;
@@ -32,7 +32,7 @@
     }
     $.extend(Slide.prototype, {
         createPagination: function(){
-            if(this.paginationType === 'outer'){
+            if(o.paginationType === 'outer'){
                 this.pagination.children().length === slideLength ?
                 pageChild = this.pagination.children() :
                 pageChild = null;
@@ -41,7 +41,7 @@
                 var pageHtml = '',
                 j;
                 for(var i = 0; i < slideLength; i ++){
-                    j = this.paginationType === 'num' ? i : '';
+                    j = o.paginationType === 'num' ? i : '';
                     pageHtml += '<a href="javascript:;">' + j + '</a>';
                 }
                 this.pagination.append(pageHtml);
@@ -55,10 +55,10 @@
         },
         setAutoPlay: function(){
             var that = this;
-            if(this.autoPlay){
+            if(o.autoPlay){
                 setInterval(function(){
                     that.slideNext();
-                }, this.autoPlay);
+                }, o.autoPlay);
             }
         },
         slideNext: function(){
@@ -68,7 +68,7 @@
         SlideAnimation: function(num){
             this.list.animate({
                 left: '+=' + num * this.liWidth + 'px'
-            }, this.speed);
+            }, o.speed);
         }
     });
     $.fn.slide = function(options){

@@ -14,14 +14,7 @@ function Slide(node, config){
     };
     $.extend(d, config);
     this.block = $(node),
-    this.dir = d.dir,
-    this.speed = d.speed,
-    this.effect = d.effect,
-    this.perGroup = d.perGroup,
-    this.perSlideView = d.perSlideView,
-    this.autoPlay = d.autoPlay,
     this.pagination = $(d.pagination),
-    this.paginationType = d.paginationType;
 	//考虑到animate()方法而暴露的变量
 	this.list = this.block.find('ul');
 	var _li = this.list.find('li');
@@ -40,18 +33,18 @@ function Slide(node, config){
 		//初始化轮播样式
 		_setStyle();
 		//添加分页器
-		if(_that.pagination) {
+		if(d.pagination) {
 			_createPagination();
 		}
         //单页状态下复制list头尾两个li元素
-        if(_that.effect === 'slide') {
+        if(d.effect === 'slide') {
         	_duplicateList();
         }
 		//默认自动播放
-		if(_that.autoPlay) {
+		if(d.autoPlay) {
             _timer = setInterval(function() {
             _that.slideNext(true);
-            }, _that.autoPlay);
+            }, d.autoPlay);
         }
 		//全屏模式下绑定鼠标滚轮事件
 		if(_that.effect === 'fullPage') {
@@ -68,7 +61,7 @@ function Slide(node, config){
 
 	this.slidePrev = function() {
 		clearInterval(_timer);
-        switch(this.effect) {
+        switch(d.effect) {
             case 'slide': {
                 _singlePageHandler('prev');
                 break;
@@ -96,7 +89,7 @@ function Slide(node, config){
         if(!notClear) {
             clearInterval(_timer);
         }
-        switch(this.effect) {
+        switch(d.effect) {
             case 'slide': {
                 _singlePageHandler('next');
                 break;
@@ -122,7 +115,7 @@ function Slide(node, config){
 
     var _slideTo = function(num) {
         clearInterval(_timer);
-        switch(_that.effect) {
+        switch(d.effect) {
             case 'slide': {
                 _singlePageHandler('to', num);
                 break;
@@ -208,13 +201,13 @@ function Slide(node, config){
 
 	//初始化样式
 	var _setStyle = function() {
-		if(_that.effect === 'fade') {
+		if(d.effect === 'fade') {
 			_that.block.width(_that.liWidth).height(_that.liHeight);
 			_that.list.addClass('slide-fade');
 			_li.eq(0).show();
 			return;
 		}
-		if (_that.effect === 'fullPage') {
+		if (d.effect === 'fullPage') {
             var $body = $("body");
 			_li.width($body.width());
 			_li.height($body.height());
@@ -222,7 +215,7 @@ function Slide(node, config){
             _that.liHeight = _li.height();
             $body = null;
         }
-        if(_that.dir === 'horizontal') {
+        if(d.dir === 'horizontal') {
             _that.block.width(_that.liWidth * _that.perGroup);
             _that.list.width(_that.liWidth * _length);
         } else {
@@ -234,14 +227,14 @@ function Slide(node, config){
 
 	//初始化分页
 	var _createPagination = function() {
-		if(_that.paginationType === 'outer') {
+		if(d.paginationType === 'outer') {
 			_that.pagination.children().length === _length ?
 			_pageChild = _that.pagination.children() :
             console.error('分页数量不匹配！');
 		} else {
             var pageHtml = '';
             for(var i = 0, j; i < _slideLength; i ++) {
-                j = _that.paginationType === 'num' ? i + 1 : '';
+                j = d.paginationType === 'num' ? i + 1 : '';
                 pageHtml += '<a href="javascript:;">' + j + '</a>';
             }
             _that.pagination.append(pageHtml);
@@ -261,7 +254,7 @@ function Slide(node, config){
 		lastList = _li.eq(-1);
 		lastList.clone().prependTo(_that.list);
 		firstList.clone().appendTo(_that.list);
-		if(_that.dir === 'horizontal') {
+		if(d.dir === 'horizontal') {
 			_that.list.css({
 				'left': -_that.liWidth + 'px',
 				'width': _that.liWidth * (_length + 2)
@@ -285,8 +278,8 @@ function Slide(node, config){
 
 	//执行滚动
 	var _slideSinglePage = function(num) {
-        _that.dir === 'horizontal' ?
-        _that.list.animate({left: '+=' + num * _that.liWidth+ 'px'}, _that.speed, function() {
+        d.dir === 'horizontal' ?
+        _that.list.animate({left: '+=' + num * _that.liWidth+ 'px'}, d.speed, function() {
             _counter -= num;
             if(_counter < 0) {
                 _counter = _length - 1;
@@ -300,7 +293,7 @@ function Slide(node, config){
                 _paginationChange();
             }
         }) :
-        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, _that.speed, function() {
+        _that.list.animate({top: '+=' + num * _that.liHeight + 'px'}, d.speed, function() {
             _counter -= num;
             if(_counter < 0) {
                 _counter = _length - 1;
@@ -318,14 +311,14 @@ function Slide(node, config){
 
     //执行多页滚动
     var _slideCarousel = function(num) {
-        _that.dir === 'horizontal' ?
-        _that.list.animate({left: '+=' + num * _that.perSlideView * _that.liWidth + 'px'}, _that.speed, function() {
+        d.dir === 'horizontal' ?
+        _that.list.animate({left: '+=' + num * _that.perSlideView * _that.liWidth + 'px'}, d.speed, function() {
             _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
             }
         }) :
-        _that.list.animate({top: '+=' + num * _that.perSlideView *_that.liHeight + 'px'}, _that.speed, function() {
+        _that.list.animate({top: '+=' + num * _that.perSlideView *_that.liHeight + 'px'}, d.speed, function() {
             _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
@@ -335,14 +328,14 @@ function Slide(node, config){
 
     //执行全屏滚动
     var _slideFullPage = function(num) {
-        _that.dir === 'horizontal' ?
-        _that.list.animate({left: '+=' + num * _that.liWidth}, _that.speed, function() {
+        d.dir === 'horizontal' ?
+        _that.list.animate({left: '+=' + num * _that.liWidth}, d.speed, function() {
                 _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
             }
         }) :
-        _that.list.animate({top: '+=' + num * _that.liHeight}, _that.speed, function() {
+        _that.list.animate({top: '+=' + num * _that.liHeight}, d.speed, function() {
                 _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
