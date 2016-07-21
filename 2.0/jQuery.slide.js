@@ -10,6 +10,7 @@
         paginationType: 'dot'  //分页器类型
     };
     var pageChild,slideLength;
+    var version = 2.0;
     function init(options){
         var o = $.extend(d, options);
         var that = this;
@@ -73,5 +74,6 @@
     });
     $.fn.slide = function(options){
         new Slide($(this), options);
+        return version;
     };
 }(jQuery));
