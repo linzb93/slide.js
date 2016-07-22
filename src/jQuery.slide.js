@@ -22,7 +22,7 @@ function Slide(node, config){
 	this.liHeight = _li.height();
 	//与轮播直接相关的内部变量
 	var	_length = _li.length,
-	_slideLength = Math.ceil((_length - this.perGroup) / this.perSlideView) + 1,
+	_slideLength = Math.ceil((_length - d.perGroup) / d.perSlideView) + 1,
 	_timer = null,
 	_counter = 0,
     _pageChild = null,
@@ -216,13 +216,13 @@ function Slide(node, config){
             $body = null;
         }
         if(d.dir === 'horizontal') {
-            _that.block.width(_that.liWidth * _that.perGroup);
+            _that.block.width(_that.liWidth * d.perGroup);
             _that.list.width(_that.liWidth * _length);
         } else {
-            _that.block.height(_that.liHeight * _that.perGroup);
+            _that.block.height(_that.liHeight * d.perGroup);
             _that.list.height(_that.liHeight * _length);
         }
-        _that.list.addClass('slide-' + _that.dir);
+        _that.list.addClass('slide-' + d.dir);
     };
 
 	//初始化分页
@@ -312,13 +312,13 @@ function Slide(node, config){
     //执行多页滚动
     var _slideCarousel = function(num) {
         d.dir === 'horizontal' ?
-        _that.list.animate({left: '+=' + num * _that.perSlideView * _that.liWidth + 'px'}, d.speed, function() {
+        _that.list.animate({left: '+=' + num * d.perSlideView * _that.liWidth + 'px'}, d.speed, function() {
             _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
             }
         }) :
-        _that.list.animate({top: '+=' + num * _that.perSlideView *_that.liHeight + 'px'}, d.speed, function() {
+        _that.list.animate({top: '+=' + num * d.perSlideView *_that.liHeight + 'px'}, d.speed, function() {
             _counter -= num;
             if(_that.pagination) {
                 _paginationChange();
