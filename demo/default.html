@@ -21,7 +21,15 @@
 		</div>
 		<a href="javascript:;" title="" class="prev prev1"><</a>
 		<a href="javascript:;" title="" class="next next1">></a>
-		<div class="page" id="page-default"></div>
+		<div class="page" id="page-default">
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+			<a href="javascript:;" title=""></a>
+		</div>
 		<h5>Default</h5>
 	</div>
 	<div class="slide" id="carousel">
@@ -48,7 +56,9 @@
 				next: '.next1',
 				prev: '.prev1',
 				pagination: '#page-default',
-				dir: 'vertical'
+				dir: 'vertical',
+				paginationType: 'outer',
+				currentClass: true
 			});
 			$("#carousel .slide-wrapper").slide({
 				next: '.next2',
