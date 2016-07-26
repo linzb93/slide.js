@@ -9,8 +9,11 @@
         perSlideView: 1,  //每次滚动的数量
         autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
         pagination: null,  //分页器
-        paginationType: 'dot'  //分页器类型
+        paginationType: 'dot',  //分页器类型
+        currentClass: false  //当前页面的class
     };
+    var CUR_CLASS_NAME = 'slide-active',
+        DUPLICATE_CLASS_NAME = 'slide-duplicate';
     function init(options){
         var o = $.extend({}, d, options);
         this.o = o;
@@ -25,6 +28,7 @@
         this.perGroup = this.o.perGroup;
         this.perSlideView = this.o.perSlideView;
         this.paginationType = this.o.paginationType;
+        this.currentClass = this.o.currentClass;
         this.list = this.block.find('ul');
         this.li = this.list.find('li');
         this.liWidth = this.li.width();
@@ -34,6 +38,7 @@
         this.pageChild = null;
         this.timer = null;
         this.counter = 0;
+        this.lock = false;
         //初始化轮播样式
         this.setStyle();
         //添加分页器
@@ -45,9 +50,38 @@
             this.duplicateList();
         }
         //绑定事件
-        this.bindEvent();
+        bindEvent(this);
         //自动播放
-        this.setAutoPlay();
+        setAutoPlay(this);
+    }
+    function bindEvent($ele){
+        $ele.pageChild.on('click', function(){
+            $ele.slideTo($(this).index());
+        })
+        $ele.btnPrev.on('click', function(){
+            $ele.slidePrev();
+        });
+        $ele.btnNext.on('click', function(){
+            $ele.slideNext();
+        });
+        //全屏模式下绑定鼠标滚轮事件
+        if($ele.effect === 'fullPage') {
+            $(document).on("mousewheel DOMMouseScroll", function(e) {
+                e.preventDefault();
+                var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
+                value > 0 ?
+                $ele.slidePrev() :
+                $ele.slideNext();
+                value = null;
+            });
+        }
+    }
+    function setAutoPlay($ele){
+        if($ele.autoPlay){
+            setInterval(function(){
+                $ele.slideNext(true);
+            }, $ele.autoPlay);
+        }
     }
     function Slide($this, options){
         this.$this = $this;
@@ -56,7 +90,6 @@
     $.extend(Slide.prototype, {
         setStyle: function(){
             var that = this;
-
             if(this.effect === 'fade') {
                 this.block.width(this.liWidth).height(this.liHeight);
                 this.list.addClass('slide-fade');
@@ -79,11 +112,14 @@
                 this.list.height(that.liHeight * that.length);
             }
             this.list.addClass('slide-' + that.dir);
+            if(this.currentClass){
+                this.li.first().addClass(CUR_CLASS_NAME);
+            }
         },
         createPagination: function(){
             var that = this;
             if(this.o.paginationType === 'outer'){
-                this.pagination.children().length === slideLength ?
+                this.pagination.children().length === this.slideLength ?
                 this.pageChild = this.pagination.children() :
                 this.pageChild = null;
             }
@@ -95,39 +131,8 @@
                 }
                 this.pagination.append(pageHtml);
                 this.pageChild = this.pagination.children();
-                this.pageChild.first().addClass('on');
             }
-        },
-        bindEvent: function(){
-            var that = this;
-            this.pageChild.on('click', function(){
-                that.slideTo($(this).index());
-            })
-            this.btnPrev.on('click', function(){
-                that.slidePrev();
-            });
-            this.btnNext.on('click', function(){
-                that.slideNext();
-            });
-            //全屏模式下绑定鼠标滚轮事件
-            if(this.o.effect === 'fullPage') {
-                $(document).on("mousewheel DOMMouseScroll", function(e) {
-                    e.preventDefault();
-                    var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
-                    value > 0 ?
-                    that.slidePrev() :
-                    that.slideNext();
-                    value = null;
-                });
-            }
-        },
-        setAutoPlay: function(){
-            var that = this;
-            if(this.autoPlay){
-                setInterval(function(){
-                    that.slideNext(true);
-                }, this.autoPlay);
-            }
+            this.pageChild.first().addClass('on');
         },
         slidePrev: function(){
             clearInterval(this.timer);
@@ -238,7 +243,8 @@
                     this.slideFullPage(1);
                 }
             } else if(btnDir === 'next') {
-                if(this.counter < length - 1) {
+                if(this.counter < this.length - 1) {
+                    console.log('in');
                     this.slideFullPage(-1);
                 }
             } else {
@@ -258,15 +264,18 @@
                 this.slideFade(num);
             }
         },
-        paginationChange: function() {
-            this.pageChild.eq(this.counter).addClass('on').siblings().removeClass('on');
+        currentClassChange: function() {
+            if(this.currentClass){
+                this.li.eq(this.counter).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
+            }
+            if(this.pagination){
+                this.pageChild.eq(this.counter).addClass('on').siblings().removeClass('on');
+            }
         },
         duplicateList: function() {
-            var firstList = this.li.eq(0),
-            lastList = this.li.eq(-1),
-            that = this;
-            lastList.clone().prependTo(this.list);
-            firstList.clone().appendTo(this.list);
+            var that = this;
+            this.li.last().clone().prependTo(this.list);
+            this.li.first().clone().appendTo(this.list);
             if(this.dir === 'horizontal') {
                 this.list.css({
                     'left': -that.liWidth + 'px',
@@ -275,11 +284,11 @@
             } else {
                 this.list.css({
                     'top': -that.liHeight + 'px',
-                    'height': that.liHeight * (that.lengthlength + 2)
+                    'height': that.liHeight * (that.length + 2)
                 });
             }
-            this.list.find('li').eq(0).addClass('slide-duplicate').end()
-            .eq(-1).addClass('slide-duplicate');
+            this.list.find('li').first().addClass(DUPLICATE_CLASS_NAME).end()
+            .last().addClass(DUPLICATE_CLASS_NAME);
         },
         slideSinglePage: function(num) {
             var that = this;
@@ -294,9 +303,7 @@
                     that.counter = 0;
                     that.list.css('left', -that.liWidth);
                 }
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             }) :
             this.list.animate({top: '+=' + num * this.liHeight + 'px'}, this.speed, function() {
                 that.counter -= num;
@@ -308,26 +315,19 @@
                     that.counter = 0;
                     that.list.css('top', -that.liHeight);
                 }
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             });
         },
         slideCarousel: function(num) {
-
             var that = this;
             this.dir === 'horizontal' ?
             this.list.animate({left: '+=' + num * this.perSlideView * this.liWidth + 'px'}, this.speed, function() {
                 that.counter -= num;
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             }) :
             this.list.animate({top: '+=' + num * this.perSlideView * this.liHeight + 'px'}, this.speed, function() {
                 that.counter -= num;
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             }) ;
         },
         slideFullPage: function(num) {
@@ -335,15 +335,11 @@
             this.dir === 'horizontal' ?
             this.list.animate({left: '+=' + num * this.liWidth}, this.speed, function() {
                 that.counter -= num;
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             }) :
             this.list.animate({top: '+=' + num * this.liHeight}, this.speed, function() {
                 that.counter -= num;
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             })
         },
         slideFade: function(num) {
@@ -355,13 +351,11 @@
                 } else if (that.counter === that.length - 1) {
                     that.counter = -1;
                 }
-                if(that.pagination) {
-                    that.paginationChange();
-                }
+                that.currentClassChange();
             }).siblings().fadeOut(300);
         }
     });
-$.fn.slide = function(options){
-    new Slide($(this), options);
-};
-}(jQuery))
+    $.fn.slide = function(options){
+        new Slide($(this), options);
+    };
+}(jQuery));
