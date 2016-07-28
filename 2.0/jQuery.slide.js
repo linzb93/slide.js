@@ -9,7 +9,8 @@
         perSlideView: 1,  //每次滚动的数量
         autoPlay: 0,  //自动滚动的时间间隔，大于0时有效
         pagination: null,  //分页器
-        paginationType: 'dot'  //分页器类型
+        paginationType: 'dot',  //分页器类型
+        mousewheel: false  //全屏模式下使用鼠标滚轮滚动
     };
     var CUR_CLASS_NAME = 'slide-active',
         DUPLICATE_CLASS_NAME = 'slide-duplicate';
@@ -30,7 +31,7 @@
         this.perGroup = this.o.perGroup;
         this.perSlideView = this.o.perSlideView;
         this.paginationType = this.o.paginationType;
-        this.currentClass = this.o.currentClass;
+        this.mousewheel = this.o.mousewheel;
         this.list = this.block.find('ul');
         this.li = this.list.find('li');
         this.liWidth = this.li.width();
@@ -41,10 +42,12 @@
         this.pageChild = null;
         this.timer = null;
         this.counter = 0;
-        this.lock = false;  //避免用户操作过于频繁而使用的上锁机制，下同
-        this.lockPrev = false;
-        this.lockNext = false;
+        this.nextCounter = 0;
+        this.lock = false;  //避免用户操作过于频繁而使用上锁机制
         if(this.perGroup > 1 && this.effect !== 'carousel') {
+            console.error(errorMsg.effect);
+        }
+        if(this.mousewheel && this.effect !== 'fullPage') {
             console.error(errorMsg.effect);
         }
         //初始化轮播样式
@@ -72,9 +75,13 @@
         $ele.btnNext.on('click', function() {
             $ele.slideNext();
         });
-        if($ele.effect === 'fullPage') {
+        if($ele.effect === 'fullPage' && $ele.mousewheel) {
             //全屏模式下绑定鼠标滚轮事件
             $(document).on("mousewheel DOMMouseScroll", function(e) {
+                if($ele.lock) {
+                    return;
+                }
+                $ele.lock = true;
                 e.preventDefault();
                 var value = e.originalEvent.wheelDelta || -e.originalEvent.detail;
                 value > 0 ? $ele.slidePrev() : $ele.slideNext();
@@ -230,49 +237,46 @@
             }
         },
         singlePageHandler: function(btnDir, num) {
-            var nextCounter = 0;
             if(btnDir === 'prev') {
-                nextCounter = this.counter - 1;
+                this.nextCounter = this.counter - 1;
             } else if(btnDir === 'next') {
-                nextCounter = this.counter + 1;
+                this.nextCounter = this.counter + 1;
             } else {
-                nextCounter = num;
+                this.nextCounter = num;
             }
-            this.slideSinglePage((nextCounter + 1) * this.liSize, nextCounter);
+            this.slideSinglePage((this.nextCounter + 1) * this.liSize, this.nextCounter);
         },
         carouselHandler: function(btnDir, num) {
-            var nextCounter = 0;
             if(btnDir === 'prev') {
                 if(this.counter > 0) {
-                        nextCounter = this.counter - 1;
+                    this.nextCounter = this.counter - 1;
                 } else {
-                    nextCounter = this.slideLength - 1;
+                    this.nextCounter = this.slideLength - 1;
                 }
             } else if(btnDir === 'next') {
                 if(this.counter < this.slideLength - 1) {
-                    nextCounter = this.counter + 1;
+                    this.nextCounter = this.counter + 1;
                 } else {
-                    nextCounter = 0;
+                    this.nextCounter = 0;
                 }
             } else {
-                nextCounter = num;
+                this.nextCounter = num;
             }
-            this.slideCarousel(nextCounter * this.liSize * this.perSlideView, nextCounter);
+            this.slideCarousel(this.nextCounter * this.liSize * this.perSlideView, this.nextCounter);
         },
         fullPageHandler: function(btnDir, num) {
-            var nextCounter = 0;
             if(btnDir === 'prev') {
                 if(this.counter > 0) {
-                    nextCounter = this.counter - 1;
+                    this.nextCounter = this.counter - 1;
                 }
             } else if(btnDir === 'next') {
                 if(this.counter < this.length - 1) {
-                    nextCounter = this.counter + 1;
+                    this.nextCounter = this.counter + 1;
                 }
             } else {
-                nextCounter = num;
+                this.nextCounter = num;
             }
-            this.slideFullPage(nextCounter * this.liSize, nextCounter);
+            this.slideFullPage(this.nextCounter * this.liSize, this.nextCounter);
         },
         fadeHandler: function(btnDir, num) {
             if(btnDir === 'prev') {
@@ -355,10 +359,12 @@
             this.list.animate({left: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
                 that.currentClassChange();
+                that.lock = false;
             }) :
             this.list.animate({top: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
                 that.currentClassChange();
+                that.lock = false;
             });
         },
         slideFade: function(num) {
