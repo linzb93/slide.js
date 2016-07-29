@@ -100,6 +100,12 @@
             }, $ele.autoPlay);
         }
     }
+    function currentClassChange($ele, counter) {
+        $ele.li.eq(counter).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
+        if($ele.pagination) {
+            $ele.pageChild.eq(counter).addClass('on').siblings().removeClass('on');
+        }
+    }
     function Slide($this, options) {
         this.$this = $this;
         init.call(this, options);
@@ -291,12 +297,6 @@
                 this.slideFade(num);
             }
         },
-        currentClassChange: function() {
-            this.li.eq(this.counter).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
-            if(this.pagination) {
-                this.pageChild.eq(this.counter).addClass('on').siblings().removeClass('on');
-            }
-        },
         duplicateList: function() {
             var that = this;
             this.li.last().clone().prependTo(this.list);
@@ -326,7 +326,7 @@
                     that.counter = 0;
                     that.list.css('left', -that.liWidth);
                 }
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
             }) :
             this.list.animate({top: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
@@ -338,7 +338,7 @@
                     that.counter = 0;
                     that.list.css('top', -that.liHeight);
                 }
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
             });
         },
         slideCarousel: function(nextPos, num) {
@@ -346,11 +346,11 @@
             this.dir === 'horizontal' ?
             this.list.animate({left: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
             }) :
             this.list.animate({top: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
             }) ;
         },
         slideFullPage: function(nextPos, num) {
@@ -358,12 +358,12 @@
             this.dir === 'horizontal' ?
             this.list.animate({left: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
                 that.lock = false;
             }) :
             this.list.animate({top: -nextPos + 'px'}, this.speed, function() {
                 that.counter = num;
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
                 that.lock = false;
             });
         },
@@ -376,7 +376,7 @@
                 } else if (that.counter === that.length - 1) {
                     that.counter = -1;
                 }
-                that.currentClassChange();
+                currentClassChange(that, that.counter);
             }).siblings().fadeOut(300);
         }
     });
