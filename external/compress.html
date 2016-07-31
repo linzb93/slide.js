@@ -1,0 +1,57 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Compress</title>
+    <style>
+        textarea{float: left;width: 300px;height: 500px;margin: 0 50px;padding: 10px;resize: none;}
+        button{border: none;outline: none;background: #6ac6e4;position: absolute;top: 230px;left: 380px;width: 50px;height: 30px;text-align: center;line-height: 30px;color: #fff;font-size: 18px;border-radius: 5px;cursor: pointer;}
+        button:hover{background: #30beec;}
+        button:active{background: #09a8dc;}
+    </style>
+</head>
+<body>
+    <textarea class="uncompressed" placeholder="请输入需要压缩的代码"></textarea>
+    <button>压缩</button>
+    <textarea class="compressed"></textarea>
+    <script src="https://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+    // 压缩规则：
+    var arr = [
+        'createPagination → cp',
+        'singlePageHandler → sph',
+        'carouselHandler → ch',
+        'fullPageHandler → fph',
+        'fadeHandler → fh',
+        'duplicateList → dl',
+        'slideSinglePage → ssp',
+        'slideCarousel → sc',
+        'slideFullPage → sfp',
+        'slideFade → sf',
+        'counter → co',
+        'nextCounter → nco',
+        'totalHandler → th',
+        'pageChild → pc'
+    ],
+    beforeArr = [],
+    afterArr = [];
+    arrLength = arr.length;
+    for(var i = 0; i < arrLength; i ++){
+        var value = arr[i].split('→')[0].trim();
+        beforeArr.push(value);
+        value = arr[i].split('→')[1].trim();
+        afterArr.push(value);
+    }
+
+    $("button").on('click', function() {
+        var value = $(".uncompressed").val();
+        var newV = '',
+        length = beforeArr.length;
+        for(var i = 0; i< length; i ++) {
+            var exg = new RegExp(beforeArr[i], 'g');
+            value = value.replace(exg, afterArr[i]);
+        }
+        $(".compressed").val(value);
+    })
+</script>
+</body>
+</html>
