@@ -22,13 +22,6 @@
 		<a href="javascript:;" title="" class="prev prev1"><</a>
 		<a href="javascript:;" title="" class="next next1">></a>
 		<div class="page" id="page-default">
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
-			<a href="javascript:;" title=""></a>
 		</div>
 		<h5>Default</h5>
 	</div>
@@ -65,14 +58,13 @@
 		<h5>Fade</h5>
 	</div>
 	<script src="http://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
-	<script src="../2.0/jquery.slide.min.js"></script>
+	<script src="../2.0/jquery.slide.js"></script>
 	<script>
 		$(function(){
 			$("#default .slide-wrapper").slide({
 				next: '.next1',
 				prev: '.prev1',
 				pagination: '#page-default',
-				paginationType: 'outer',
 				currentClass: true
 			});
 			$("#carousel .slide-wrapper").slide({
