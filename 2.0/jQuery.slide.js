@@ -25,8 +25,8 @@
         this.btnPrev = $(this.o.prev);
         this.btnNext = $(this.o.next);
         this.pagination = $(this.o.pagination);
-        this.list = this.$this.find('ul');
-        this.li = this.list.find('li');
+        this.list = this.$this.children('ul');
+        this.li = this.list.children('li');
         this.liW = this.li.width();
         this.liH = this.li.height();
         this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
@@ -39,7 +39,7 @@
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
 
         //错误检测
-        errorDetection(this);
+      //  errorDetection(this);
 
         //初始化轮播样式
         this.setStyle();
@@ -66,47 +66,41 @@
             paginationArr = ['dot', 'num', 'outer'],
             dirArr = ['horizontal', 'vertical'];
         var errorMsg = function(opt) {
-            return opt + '的值有误，请重新填写';
-        }
+            if(opt === '$this') {
+                return '没有找到轮播组件';
+            }
+            var parentNode = ele.$this.parent(),
+            idClass = '';
+            if(!!parentNode.attr('id')) {
+                idClass = ele.$this.parent().attr('id');
+            } else {
+                idClass = ele.$this.parent().attr('class');
+            }
+            return idClass + '的' + opt + '值有误，请重新填写';
+        };
+        var booleanArr = {
+            $this: !ele.$this,
+            dir: dirArr.indexOf(ele.o.dir) < 0,
+            speed: typeof ele.o.speed !== 'number' || ele.o.speed <= 100,
+            prev: !ele.btnPrev,
+            next: !ele.btnNext,
+            effect: (ele.o.perGroup > 1 && ele.o.effect !== 'carousel') ||
+                    effectArr.indexOf(ele.o.effect) < 0,
+            perGroup: typeof ele.o.perGroup !== 'number' || ele.o.perGroup < 1,
+            perSlideView: typeof ele.o.perSlideView !== 'number' || ele.o.perSlideView < 1,
+            autoPlay: typeof ele.o.autoPlay !== 'number' || ele.o.autoPlay < 0,
+            pagination: !ele.pagination,
+            paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
+            wheel: typeof ele.o.wheel !== 'boolean'
+        };
 
-        if(!ele.$this) {
-            console.error('没有找到轮播组件');
+        if(document.documentmode < 10) {
+            alert('请勿使用低版本浏览器进行开发！');
         }
-        if(dirArr.indexOf(ele.o.dir) < 0) {
-            console.error(errorMsg('dir'));
-        }
-        if(typeof ele.o.speed !== 'num' || ele.o.speed <= 100) {
-            console.error(errorMsg('speed'));
-        }
-        if(!ele.btnPrev) {
-            console.error(errorMsg('prev'));
-        }
-        if(!ele.btnNext) {
-            console.error(errorMsg('next'));
-        }
-        if(ele.o.perGroup > 1 && ele.o.effect !== 'carousel') {
-            console.error(errorMsg('effect'));
-        }
-        if(dirArr.indexOf(ele.o.effect) < 0) {
-            console.error(errorMsg('effect'));
-        }
-        if(typeof ele.o.perGroup !== 'num' || ele.o.perGroup < 1) {
-            console.error(errorMsg('perGroup'));
-        }
-        if(typeof ele.o.perSlideView !== 'num' || ele.o.perSlideView < 1) {
-            console.error(errorMsg('perSlideView'));
-        }
-        if(typeof ele.o.autoPlay !== 'num' || ele.o.autoPlay < 0) {
-            console.error(errorMsg('autoPlay'));
-        }
-        if(!ele.pagination) {
-            console.error(errorMsg('pagination'));
-        }
-        if(dirArr.indexOf(ele.o.paginationType) < 0) {
-            console.error(errorMsg('paginationType'));
-        }
-        if(typeof ele.o.wheel !== 'boolean') {
-            console.error(errorMsg('wheel'));
+        for(var prop in booleanArr) {
+            if(booleanArr[prop]) {
+                console.error(errorMsg(prop));
+            }
         }
     }
 
@@ -138,11 +132,12 @@
                 ele.lock = true;
                 e.preventDefault();
                 (e.originalEvent.wheelDelta || -e.originalEvent.detail) > 0 ?
-                 ele.slidePrev() :
-                 ele.slideNext();
+                ele.slidePrev() :
+                ele.slideNext();
             });
             //窗口缩放时重置轮播
             $(window).on('resize', function() {
+                console.log('in');
                 ele.reset();
             });
         }
@@ -214,16 +209,17 @@
             this.li.width($('body').width()).height($('body').height());
             this.liW = this.li.width();
             this.liH = this.li.height();
+            this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
             if(this.o.dir === 'horizontal') {
                 this.list.css({
-                    'width': that.liW * that.length,
-                    'left' : -that.liW * that.counter
+                    width: that.liW * that.length,
+                    left : -that.liW * that.counter
                 });
                 this.$this.width(that.liW);
             } else {
                 this.list.css({
-                    'height': that.liH * that.length,
-                    'top'   : -that.liH * that.counter
+                    height: that.liH * that.length,
+                    top   : -that.liH * that.counter
                 });
                 this.$this.height(that.liH);
             }
@@ -244,27 +240,14 @@
         //轮播处理的入口
         totalHandler: function(btnDir, num) {
             clearInterval(this.timer);
-            switch(this.o.effect) {
-                case 'slide': {
-                    this.singlePageHandler(btnDir, num);
-                    break;
-                }
-                case 'fade': {
-                    this.fadeHandler(btnDir, num);
-                    break;
-                }
-                case 'carousel': {
-                    this.carouselHandler(btnDir, num);
-                    break;
-                }
-                case 'fullPage': {
-                    this.fullPageHandler(btnDir, num);
-                    break;
-                }
-                default: {
-                    break;
-                }
-            }
+            var that = this,
+                effectHandler = {
+                    slide: that.singlePageHandler,
+                    carousel: that.carouselHandler,
+                    fullPage: that.fullPageHandler,
+                    fade: that.fadeHandler
+                };
+            effectHandler[this.o.effect].call(this, btnDir, num);
         },
 
         singlePageHandler: function(btnDir, num) {
@@ -279,7 +262,7 @@
             } else {
                 this.nextCounter = num;
             }
-            this.slideSinglePage((this.nextCounter + 1) * this.liSize, this.nextCounter);
+            this.slideSinglePage(this.nextCounter);
         },
 
         carouselHandler: function(btnDir, num) {
@@ -290,8 +273,7 @@
             } else {
                 this.nextCounter = num;
             }
-            this.slideCarousel(this.nextCounter * this.liSize * this.o.perSlideView,
-                               this.nextCounter);
+            this.slideCarousel(this.nextCounter);
         },
 
         fullPageHandler: function(btnDir, num) {
@@ -306,7 +288,7 @@
             } else {
                 this.nextCounter = num;
             }
-            this.slideFullPage(this.nextCounter * this.liSize, this.nextCounter);
+            this.slideFullPage(this.nextCounter);
         },
 
         fadeHandler: function(btnDir, num) {
@@ -329,23 +311,25 @@
             this.li.first().clone().appendTo(this.list);
             this.o.dir === 'horizontal' ?
             this.list.css({
-                'left': -that.liW + 'px',
-                'width': that.liW * (that.length + 2)
+                left: -that.liW + 'px',
+                width: that.liW * (that.length + 2)
             }) :
             this.list.css({
-                'top': -that.liH + 'px',
-                'height': that.liH * (that.length + 2)
+                top: -that.liH + 'px',
+                height: that.liH * (that.length + 2)
             });
-            this.list.find('li').first().addClass(DUPLICATE_CLASS_NAME).end()
-            .last().addClass(DUPLICATE_CLASS_NAME);
+            this.list.children('li').first().addClass(DUPLICATE_CLASS_NAME).end()
+            .last().addClass(DUPLICATE_CLASS_NAME).removeClass(CUR_CLASS_NAME);
         },
 
         //执行轮播。下同
-        slideSinglePage: function(nextPos, num) {
+        slideSinglePage: function(nextCo) {
             var that = this;
             this.o.dir === 'horizontal' ?
-            this.list.animate({'left': -nextPos}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                left: -(nextCo + 1) * that.liSize
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 if(that.counter < 0) {
                     that.counter = that.length - 1;
                     that.list.css('left', -that.liW * that.length);
@@ -356,8 +340,10 @@
                 currentClassChange(that);
                 that.lock = false;
             }) :
-            this.list.animate({'top': -nextPos}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                top: -(nextCo + 1) * that.liSize
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 if(that.counter < 0) {
                     that.counter = that.length - 1;
                     that.list.css('top', -that.liH * that.length);
@@ -370,29 +356,37 @@
             });
         },
 
-        slideCarousel: function(nextPos, num) {
+        slideCarousel: function(nextCo, num) {
             var that = this;
             this.o.dir === 'horizontal' ?
-            this.list.animate({'left': -nextPos}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                left: -that.nextCounter * that.liSize * that.o.perSlideView
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 currentClassChange(that);
             }) :
-            this.list.animate({'top': -nextPos}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                top: -that.nextCounter * that.liSize * that.o.perSlideView
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 currentClassChange(that);
-            }) ;
+            });
         },
 
-        slideFullPage: function(nextPos, num) {
+        slideFullPage: function(nextCo, num) {
             var that = this;
             this.o.dir === 'horizontal' ?
-            this.list.animate({'left': -nextPos}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                left: -nextCo * that.liSize
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 currentClassChange(that);
                 that.lock = false;
             }) :
-            this.list.animate({'top': -nextPos + 'px'}, this.o.speed, function() {
-                that.counter = num;
+            this.list.animate({
+                top: -nextCo * that.liSize
+            }, this.o.speed, function() {
+                that.counter = nextCo;
                 currentClassChange(that);
                 that.lock = false;
             });
