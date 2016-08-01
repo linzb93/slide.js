@@ -4,7 +4,7 @@ html,
 body,
 .slide,
 .slide-wrapper{width: 100%;height: 100%;position: relative;}
-li{list-style-type: none;}
+li{list-style-type: none;width: 100%;height: 100%;}
 .color{width: 100%;height: 100%;text-align: center;font-size: 80px;color: #fff;position: relative;}
 .slide{position: absolute;left: 0;top: 0;}
 .orange{background: orange;}
@@ -24,4 +24,3 @@ a:hover{text-decoration: none;}
 .clearfix:after{ content:""; height:0; visibility:hidden; display:block; clear:both;}
 .inner{position: absolute;left: 0;top: 0;width: 100%;height: 100%;}
 #inner-slide{position: relative;width: 100%;height: 100%;}
-#inner-slide li{width: 100%;height: 100%;}
