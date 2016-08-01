@@ -39,7 +39,7 @@
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
 
         //错误检测
-      //  errorDetection(this);
+        errorDetection(this);
 
         //初始化轮播样式
         this.setStyle();
@@ -62,6 +62,9 @@
     }
 
     function errorDetection(ele) {
+        if(document.documentMode < 10) {
+            alert('请勿使用低版本浏览器进行开发！');
+        }
         var effectArr = ['slide', 'carousel', 'fullPage', 'fade'],
             paginationArr = ['dot', 'num', 'outer'],
             dirArr = ['horizontal', 'vertical'];
@@ -93,10 +96,6 @@
             paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
             wheel: typeof ele.o.wheel !== 'boolean'
         };
-
-        if(document.documentmode < 10) {
-            alert('请勿使用低版本浏览器进行开发！');
-        }
         for(var prop in booleanArr) {
             if(booleanArr[prop]) {
                 console.error(errorMsg(prop));
