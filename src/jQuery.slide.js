@@ -144,7 +144,7 @@
 
     function setAutoPlay(ele) {
         if(ele.o.autoPlay){
-            setInterval(function() {
+            ele.timer = setInterval(function() {
                 ele.totalHandler('next');
             }, ele.o.autoPlay);
         }
@@ -225,20 +225,22 @@
         },
 
         slidePrev: function() {
+            clearInterval(this.timer);
             this.totalHandler('prev');
         },
 
         slideNext: function() {
+            clearInterval(this.timer);
             this.totalHandler('next');
         },
 
         slideTo: function(num) {
+            clearInterval(this.timer);
             this.totalHandler('to', num);
         },
 
         //轮播处理的入口
         totalHandler: function(btnDir, num) {
-            clearInterval(this.timer);
             var that = this,
                 effectHandler = {
                     slide: that.singlePageHandler,
