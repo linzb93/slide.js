@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<title>Default</title>
-	<link rel="stylesheet" type="text/css" href="../src/jQuery.slide.css">
+	<link rel="stylesheet" type="text/css" href="../src/jquery.slide.css">
 	<link rel="stylesheet" type="text/css" href="css/common.css">
 </head>
 <body>
@@ -19,9 +19,10 @@
 				<li><div class="orange">Slide 7</div></li>
 			</ul>
 		</div>
-		<a href="javascript:;" title="" class="prev"><</a>
-		<a href="javascript:;" title="" class="next">></a>
-		<div class="page" id="page-default"></div>
+		<a href="javascript:;" title="" class="prev prev1"><</a>
+		<a href="javascript:;" title="" class="next next1">></a>
+		<div class="page" id="page-default">
+		</div>
 		<h5>Default</h5>
 	</div>
 	<div class="slide" id="carousel">
@@ -33,11 +34,10 @@
 				<li><div class="orange">Slide 4</div></li>
 				<li><div class="green">Slide 5</div></li>
 				<li><div class="blue">Slide 6</div></li>
-				<li><div class="orange">Slide 7</div></li>
 			</ul>
 		</div>
-		<a href="javascript:;" title="" class="prev"><</a>
-		<a href="javascript:;" title="" class="next">></a>
+		<a href="javascript:;" title="" class="prev prev2"><</a>
+		<a href="javascript:;" title="" class="next next2">></a>
 		<div class="page" id="page-carousel"></div>
 		<h5>Carousel</h5>
 	</div>
@@ -50,48 +50,36 @@
 				<li><div class="orange">Slide 4</div></li>
 				<li><div class="green">Slide 5</div></li>
 				<li><div class="blue">Slide 6</div></li>
-				<li><div class="orange">Slide 7</div></li>
 			</ul>
 		</div>
-		<a href="javascript:;" title="" class="prev"><</a>
-		<a href="javascript:;" title="" class="next">></a>
+		<a href="javascript:;" title="" class="prev prev3"><</a>
+		<a href="javascript:;" title="" class="next next3">></a>
 		<div class="page" id="page-fade"></div>
 		<h5>Fade</h5>
 	</div>
-	<script src="http://cdn.bootcss.com/jquery/1.8.3/jquery.min.js"></script>
-	<script src="../src/jQuery.slide.js"></script>
+	<script src="js/jquery-1.8.0.min.js"></script>
+	<script src="../src/jquery.slide.js"></script>
 	<script>
 		$(function(){
-			var mySlide1 = new Slide("#default .slide-wrapper", {
-				pagination: '#page-default'
+			$("#default .slide-wrapper").slide({
+				next: '.next1',
+				prev: '.prev1',
+				pagination: '#page-default',
+				currentClass: true
 			});
-			$("#default .prev").on('click', function(){
-				mySlide1.slidePrev();
-			})
-			$("#default .next").on('click', function() {
-				mySlide1.slideNext();
-			});
-			var mySlide2 = new Slide("#carousel .slide-wrapper", {
+			$("#carousel .slide-wrapper").slide({
+				next: '.next2',
+				prev: '.prev2',
 				pagination: '#page-carousel',
-				effect: 'carousel',
 				perGroup: 3,
-				perSlideView: 2
+				perSlideView: 2,
+				effect: 'carousel'
 			});
-			$("#carousel .prev").on('click', function(){
-				mySlide2.slidePrev();
-			})
-			$("#carousel .next").on('click', function() {
-				mySlide2.slideNext();
-			});
-			var mySlide3 = new Slide("#fade .slide-wrapper", {
+			$("#fade .slide-wrapper").slide({
+				next: '.next3',
+				prev: '.prev3',
 				pagination: '#page-fade',
 				effect: 'fade'
-			});
-			$("#fade .prev").on('click', function(){
-				mySlide3.slidePrev();
-			})
-			$("#fade .next").on('click', function() {
-				mySlide3.slideNext();
 			});
 		});
 	</script>
