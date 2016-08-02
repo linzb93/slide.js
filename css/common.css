@@ -28,8 +28,12 @@ a:hover{text-decoration: none;}
 #carousel li{width: 200px;font-size: 20px;}
 
 /*tab*/
-.each-news{line-height: 2;height: auto;color: #000;position: relative;}
+.each-news{line-height: 2;height: auto;color: #000;position: relative;padding: 0 10px;}
 #tab h4{font-size: 14px;text-align: left;}
-#tab span{position: absolute;right: 0;top: 0;color: #999;}
+#tab span{position: absolute;right: 30px;top: 0;color: #999;}
 #tab li{width: 600px;}
 #tab .slide-wrapper{background: #eee;}
+.page-tab a{float: left;width: 80px;line-height: 30px;background: #000;color: #fff;text-align: center;margin-right: 10px;}
+.page-tab a.on{background: #666;}
+.tip{position: fixed;left: 20px;top: 20px;width: 80px;color:#000;}
+.tip:hover{text-decoration: underline;}
