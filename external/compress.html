@@ -30,7 +30,9 @@
         'counter → co',
         'nextCounter → nco',
         'totalHandler → th',
-        'pageChild → pc'
+        'pageChild → pc',
+        'setStyle → ss',
+        'liSize → lis'
     ],
     beforeArr = [],
     afterArr = [];
@@ -44,14 +46,13 @@
 
     $("button").on('click', function() {
         var value = $(".uncompressed").val();
-        var newV = '',
-        length = beforeArr.length;
+        var length = beforeArr.length;
         for(var i = 0; i< length; i ++) {
             var exg = new RegExp(beforeArr[i], 'g');
             value = value.replace(exg, afterArr[i]);
         }
         $(".compressed").val(value);
-    })
+    });
 </script>
 </body>
 </html>
