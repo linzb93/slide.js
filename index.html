@@ -8,6 +8,7 @@
 </head>
 <body>
 	<div class="slide" id="default">
+		<h3>单页滚动</h3>
 		<div class="slide-wrapper">
 			<ul class="clearfix">
 				<li><div class="orange">Slide 1</div></li>
@@ -21,11 +22,10 @@
 		</div>
 		<a href="javascript:;" title="" class="prev prev1"><</a>
 		<a href="javascript:;" title="" class="next next1">></a>
-		<div class="page" id="page-default">
-		</div>
-		<h5>Default</h5>
+		<div class="page" id="page-default"></div>
 	</div>
 	<div class="slide" id="carousel">
+		<h3>多页滚动</h3>
 		<div class="slide-wrapper">
 			<ul class="clearfix">
 				<li><div class="orange">Slide 1</div></li>
@@ -39,9 +39,9 @@
 		<a href="javascript:;" title="" class="prev prev2"><</a>
 		<a href="javascript:;" title="" class="next next2">></a>
 		<div class="page" id="page-carousel"></div>
-		<h5>Carousel</h5>
 	</div>
 	<div class="slide" id="fade">
+		<h3>焦点轮播</h3>
 		<div class="slide-wrapper">
 			<ul class="clearfix">
 				<li><div class="orange">Slide 1</div></li>
@@ -55,7 +55,92 @@
 		<a href="javascript:;" title="" class="prev prev3"><</a>
 		<a href="javascript:;" title="" class="next next3">></a>
 		<div class="page" id="page-fade"></div>
-		<h5>Fade</h5>
+	</div>
+	<div class="slide" id="tab">
+		<h3>标签切换</h3>
+		<div class="slide-wrapper">
+			<ul class="clearfix">
+				<li>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是今天的新闻。</h4>
+						<span>2016-05-07</span>
+					</div>
+				</li>
+				<li>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是明天的新闻。</h4>
+						<span>2016-07-07</span>
+					</div>
+				</li>
+				<li>
+					<div class="each-news">
+						<h4>这是后天的新闻。</h4>
+						<span>2016-01-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是后天的新闻。</h4>
+						<span>2016-01-07</span>
+					</div>
+					<div class="each-news">
+						<h4>这是后天的新闻。</h4>
+						<span>2016-01-07</span>
+					</div>
+
+					<div class="each-news">
+						<h4>这是后天的新闻。</h4>
+						<span>2016-01-07</span>
+					</div><div class="each-news">
+						<h4>这是后天的新闻。</h4>
+						<span>2016-01-07</span>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<div class="page-tab">
+			<a class="on" href="javascript:;" title="">国内新闻</a>
+			<a href="javascript:;" title="">国外新闻</a>
+			<a href="javascript:;" title="">体育新闻</a>
+		</div>
 	</div>
 	<script src="js/jquery-1.8.0.min.js"></script>
 	<script src="js/jquery.slide.min.js"></script>
@@ -80,6 +165,11 @@
 				prev: '.prev3',
 				pagination: '#page-fade',
 				effect: 'fade'
+			});
+			$("#tab .slide-wrapper").slide({
+				effect: 'fade',
+				pagination: '#page-tab',
+				paginationType: 'outer'
 			});
 		});
 	</script>
