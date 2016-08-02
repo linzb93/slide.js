@@ -12,7 +12,7 @@ jquery.slide.js更新至2.0版了！新版使用自定义jQuery方法的方式�
 - 修复轮播无法嵌套的bug
 - 修复因用户操作过于频繁导致界面出现异常，以及性能降低的bug；
 - 提供开发版（未压缩）和生产版（压缩）两个版本，开发时请使用开发版，有较完整的错误提醒
-- 提供了代码规范文档，欢迎各位为jquery.slide.js贡献代码
+- 提供了代码规范文档[CONTRIBUTION.md](https://github.com/linzb93/slide/blob/master/doc/CONTRIBUTION.md)，欢迎各位为jquery.slide.js贡献代码
 
 ## V1.5
 

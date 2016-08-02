@@ -5,7 +5,7 @@
 ##简介
 jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
 
-jquery.slide.js已于2016年8月2日升级为2.0版。和1.x版相比，拥有错误提示，开发更友好。压缩版仅有5.25kb。
+jquery.slide.js已于2016年8月2日升级为2.0版。和1.x版相比，拥有错误提示，开发更友好。压缩版仅有5.3kb。
 
 
 
@@ -25,7 +25,12 @@ jquery.slide.js已于2016年8月2日升级为2.0版。和1.x版相比，拥有�
 
 ##使用方法
 
-###引入两个文件：jquery.slide.css和jquery.slide.js
+###引入文件
+
+- jQuery.js(1.8.0+)
+- jquery.slide.css
+- jquery.slide.js
+
 ```html
 <link rel="stylesheet" type="text/css" href="jquery.slide.css">
 ...
@@ -80,9 +85,7 @@ $('.slide-wrapper').slide({
 
 ## 贡献
 
-如果你有打算为jquery.slide.js贡献代码。请采用fork + pull request 方式，并在发起pr前先将master上超前的代码rebase到自己的分支上。
-
-代码规范详见[CONTRIBUTION.md](https://github.com/linzb93/slide/blob/master/doc/CONTRIBUTION.md)
+如果你有打算为jquery.slide.js贡献代码。请采用fork + pull request 方式，并在发起pr前先将master上超前的代码rebase到自己的分支上。代码规范详见[CONTRIBUTION.md](https://github.com/linzb93/slide/blob/master/doc/CONTRIBUTION.md)
 
 
 
