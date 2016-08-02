@@ -1,18 +1,41 @@
-# 关于 jQuery.slide.js
+# 关于 jquery.slide.js
+
+
 
 ##简介
-jQuery.slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比，jQuery.slide.js体积较小，节省浏览器的解析时间，并且拥有Swiper的多数常用功能。
+jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
 
-这个插件的参数列表和Swiper几乎是一样的，如果你使用过Swiper那再好不过了。如果你没有使用过Swiper，那我这里简单讲下参数列表的使用方法。
+jquery.slide.js已于2016年8月2日升级为2.0版。和1.x版相比，拥有错误提示，开发更友好。压缩版仅有5.3kb。
+
+
+
+## 功能概述
+
+可实现web端的单页滚动、多页滚动、全屏滚动和焦点轮播的效果。可自定义参数。
+
+查看在线Demo请点击[这里](https://linzb93.github.io/jquery.slide.js/)。
+
+
+
+## 兼容性
+
+兼容IE7及以上的浏览器。
+
+
 
 ##使用方法
 
-###引入三个文件：jQuery1.3+、jQuery.slide.css和jQuery.slide.js
+###引入文件
+
+- jQuery.js(1.8.0+)
+- jquery.slide.css
+- jquery.slide.js
+
 ```html
-<link rel="stylesheet" type="text/css" href="jQuery.slide.css">
+<link rel="stylesheet" type="text/css" href="jquery.slide.css">
 ...
 <script type="text/javascript" src="jquery-1.8.0.min.js"></script>
-<script type="text/javascript" src="jQuery.slide.js"></script>
+<script type="text/javascript" src="jquery.slide.js"></script>
 ```
 
 ###HTML结构
@@ -38,25 +61,34 @@ jQuery.slide.js是一个基于jQuery的轻量的轮播插件。和Swiper相比�
 ###配置参数调用方法
 ```javascript
 
-var mySlide = new Slide('.slide-wrapper', {
-autoplay: 3000,
-speed: 500
-});
-
-```
-其中，autoplay表示自动播放的间隔时间，speed表示图片切换的速度。这样，通过新建Slide这个对象的实例，我们就建立了一个轮播图。
-
-使用按钮切换轮播图：
-```javascript
-$leftBtn.on('click', function(){
-	mySlide.slidePrev();
-});
-$rightBtn.on('click', function(){
-	mySlide.slideNext();
+$('.slide-wrapper').slide({
+	speed: 500,
+	prev: '.prev',
+	next: '.next',
+  	autoplay: 3000,
+	pagination: '.page'
 });
 ```
+
+
+## 文档
+
+### API
+
+[API.md](https://github.com/linzb93/slide/blob/master/doc/API.md)
+
+### 更新日志
+
+[CHANGELOG.md](https://github.com/linzb93/slide/blob/master/doc/CHANGELOG.md)
+
+
+
+## 贡献
+
+如果你有打算为jquery.slide.js贡献代码。请采用fork + pull request 方式，并在发起pr前先将master上超前的代码rebase到自己的分支上。代码规范详见[CONTRIBUTION.md](https://github.com/linzb93/slide/blob/master/doc/CONTRIBUTION.md)
+
+
+
 ##其他
 
-其他参数列表会在[API.md](https://github.com/linzb93/slide/blob/master/doc/API.md)里面展现，这里不再重复。
-
-_注：从V1.1开始，新增Dev分支。Dev分支上的文件是还在开发当中的，请勿使用。请使用master分支的文件，都是正式版的。
+想了解开发进度，请关注Trello：https://trello.com/b/2FhJxWw0/jquery-slide-js。
