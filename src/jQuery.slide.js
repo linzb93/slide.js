@@ -144,7 +144,7 @@
 
     function setAutoPlay(ele) {
         if(ele.o.autoPlay){
-            ele.timer = setInterval(function() {
+            setInterval(function() {
                 ele.totalHandler('next');
             }, ele.o.autoPlay);
         }
