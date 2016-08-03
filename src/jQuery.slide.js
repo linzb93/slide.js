@@ -85,20 +85,17 @@
             $this: !ele.$this,
             dir: dirArr.indexOf(ele.o.dir) < 0,
             speed: typeof ele.o.speed !== 'number' || ele.o.speed <= 100,
-            prev: !ele.btnPrev,
-            next: !ele.btnNext,
             effect: (ele.o.perGroup > 1 && ele.o.effect !== 'carousel') ||
                     effectArr.indexOf(ele.o.effect) < 0,
             perGroup: typeof ele.o.perGroup !== 'number' || ele.o.perGroup < 1,
             perSlideView: typeof ele.o.perSlideView !== 'number' || ele.o.perSlideView < 1,
             autoPlay: typeof ele.o.autoPlay !== 'number' || ele.o.autoPlay < 0,
-            pagination: !ele.pagination,
             paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
             wheel: typeof ele.o.wheel !== 'boolean'
         };
         for(var prop in booleanArr) {
             if(booleanArr[prop]) {
-                console.error(errorMsg(prop));
+                console.warn(errorMsg(prop));
             }
         }
     }
