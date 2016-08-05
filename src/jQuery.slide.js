@@ -6,6 +6,7 @@
         prev: '',               //上翻页按钮
         next: '',               //下翻页按钮
         effect: 'slide',        //效果
+        loop: true,             //循环播放
         perGroup: 1,            //显示数量
         perSlideView: 1,        //每次滚动的数量
         autoPlay: 0,            //自动滚动的时间间隔
@@ -49,15 +50,15 @@
         }
 
         //单页状态下复制list头尾两个li元素
-        if (this.o.effect === 'slide') {
+        if (this.o.effect === 'slide' && this.o.loop) {
             this.duplicateList();
         }
 
         //绑定事件
-        bindEvent(this);
+        this.bindEvent();
 
         //自动播放
-        setAutoPlay(this);
+        this.setAutoPlay();
     }
 
     function errorDetection(ele) {
@@ -104,55 +105,6 @@
         init.call(this, option);
     }
 
-    function bindEvent(ele) {
-        ele.pageChild.on('click', function() {
-            ele.slideTo($(this).index());
-        });
-        ele.btnPrev.on('click', function() {
-            ele.slidePrev();
-        });
-        ele.btnNext.on('click', function() {
-            ele.slideNext();
-        });
-
-        if (ele.o.effect === 'fullPage') {
-            //全屏模式下绑定鼠标滚轮事件
-            $(document).on('mousewheel DOMMouseScroll', function(e) {
-                if (!ele.o.wheel) {
-                    return;
-                }
-                if (ele.lock) {
-                    return;
-                }
-                ele.lock = true;
-                e.preventDefault();
-                (e.originalEvent.wheelDelta || -e.originalEvent.detail) > 0 ?
-                    ele.slidePrev() :
-                    ele.slideNext();
-            });
-            //窗口缩放时重置轮播
-            $(window).on('resize', function() {
-                console.log('in');
-                ele.reset();
-            });
-        }
-    }
-
-    function setAutoPlay(ele) {
-        if (ele.o.autoPlay) {
-            ele.timer = setInterval(function() {
-                ele.totalHandler('next');
-            }, ele.o.autoPlay);
-        }
-    }
-
-    function currentClassChange(ele) {
-        ele.li.eq(ele.counter).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
-        if (ele.o.pagination) {
-            ele.pageChild.eq(ele.counter).addClass('on').siblings().removeClass('on');
-        }
-    }
-
     $.extend(Slide.prototype, {
         setStyle: function() {
             var that = this;
@@ -164,8 +116,7 @@
             }
 
             if (this.o.effect === 'fullPage') {
-                this.li.width($("body").width())
-                    .height($("body").height());
+                this.li.width($("body").width()).height($("body").height());
                 this.liW = this.li.width();
                 this.liH = this.li.height();
                 this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
@@ -200,7 +151,7 @@
             this.pageChild.first().addClass('on');
         },
 
-        reset: function() {
+        fullPageReset: function() {
             var that = this;
             this.li.width($('body').width()).height($('body').height());
             this.liW = this.li.width();
@@ -218,6 +169,55 @@
                     top   : -that.liH * that.counter
                 });
                 this.$this.height(that.liH);
+            }
+        },
+
+        bindEvent: function() {
+            var that = this;
+            if (this.pageChild) {
+                this.pageChild.on('click', function() {
+                    if (that.counter === $(this).index()) {
+                        return;
+                    }
+                    that.slideTo($(this).index());
+                });
+            }
+            if (this.btnPrev || this.btnNext) {
+                this.btnPrev.on('click', function() {
+                    that.slidePrev();
+                });
+                this.btnNext.on('click', function() {
+                    that.slideNext();
+                });
+            }
+
+            if (this.o.effect === 'fullPage') {
+
+                //全屏模式下绑定鼠标滚轮事件
+                $(document).on('mousewheel DOMMouseScroll', function(e) {
+                    if (!that.o.wheel || that.lock) {
+                        return;
+                    }
+                    that.lock = true;
+                    e.preventDefault();
+                    (e.originalEvent.wheelDelta || -e.originalEvent.detail) > 0 ?
+                        that.slidePrev() :
+                        that.slideNext();
+                });
+
+                //窗口缩放时重置轮播
+                $(window).on('resize', function() {
+                    that.fullPageReset();
+                });
+            }
+        },
+
+        setAutoPlay: function() {
+            var that = this;
+            if (this.o.autoPlay) {
+                this.timer = setInterval(function() {
+                    that.totalHandler('next');
+                }, that.o.autoPlay);
             }
         },
 
@@ -249,13 +249,22 @@
         },
 
         singlePageHandler: function(btnDir, num) {
+            console.log(this.lock)
             if (this.lock) {
                 return;
             }
             this.lock = true;
             if (btnDir === 'prev') {
+                console.log(this.counter)
+                if(!this.o.loop && this.counter === 0){
+                    return;
+                }
                 this.nextCounter = this.counter - 1;
             } else if (btnDir === 'next') {
+                console.log(this.counter)
+                if(!this.o.loop && this.counter === this.length - 1){
+                    return;
+                }
                 this.nextCounter = this.counter + 1;
             } else {
                 this.nextCounter = num;
@@ -319,12 +328,22 @@
             this.list.children('li').last().removeClass(CUR_CLASS_NAME);
         },
 
+        currentClassChange: function() {
+            this.li.eq(this.counter).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
+            if (this.o.pagination) {
+                this.pageChild.eq(this.counter).addClass('on').siblings().removeClass('on');
+            }
+        },
+
         //执行轮播。下同
         slideSinglePage: function(nextCo) {
             var that = this;
+            if (this.o.loop) {
+                nextCo++;
+            }
             this.o.dir === 'horizontal' ?
                 this.list.animate({
-                    left: -(nextCo + 1) * that.liSize
+                    left: -nextCo * that.liSize
                 }, this.o.speed, function() {
                     that.counter = nextCo;
                     if (that.counter < 0) {
@@ -334,7 +353,7 @@
                         that.counter = 0;
                         that.list.css('left', -that.liW);
                     }
-                    currentClassChange(that);
+                    that.currentClassChange();
                     that.lock = false;
                 }) :
                 this.list.animate({
@@ -348,7 +367,7 @@
                         that.counter = 0;
                         that.list.css('top', -that.liH);
                     }
-                    currentClassChange(that);
+                    that.currentClassChange();
                     that.lock = false;
                 });
         },
@@ -357,52 +376,51 @@
             var that = this;
             this.o.dir === 'horizontal' ?
                 this.list.animate({
-                    left: -that.nextCounter * that.liSize * that.o.perSlideView
+                    left: -nextCo * that.liSize * that.o.perSlideView
                 }, this.o.speed, function() {
                     that.counter = nextCo;
-                    currentClassChange(that);
+                    that.currentClassChange();
                 }) :
                 this.list.animate({
-                    top: -that.nextCounter * that.liSize * that.o.perSlideView
+                    top: -nextCo * that.liSize * that.o.perSlideView
                 }, this.o.speed, function() {
                     that.counter = nextCo;
-                    currentClassChange(that);
+                    that.currentClassChange();
                 });
         },
 
-        slideFullPage: function(nextCo, num) {
+        slideFullPage: function(nextCo) {
             var that = this;
             this.o.dir === 'horizontal' ?
                 this.list.animate({
                     left: -nextCo * that.liSize
                 }, this.o.speed, function() {
                     that.counter = nextCo;
-                    currentClassChange(that);
+                    that.currentClassChange();
                     that.lock = false;
                 }) :
                 this.list.animate({
                     top: -nextCo * that.liSize
                 }, this.o.speed, function() {
                     that.counter = nextCo;
-                    currentClassChange(that);
+                    that.currentClassChange();
                     that.lock = false;
                 });
         },
 
         slideFade: function(num) {
             var that = this;
-             this.li.eq(num).fadeIn(300, function() {
+             this.li.eq(num).fadeIn(this.o.speed, function() {
                 that.counter = num;
                 if (that.counter === -1) {
                     that.counter = that.length - 1;
                 } else if (that.counter === that.length - 1) {
                     that.counter = -1;
                 }
-                currentClassChange(that);
-            }).siblings().fadeOut(300);
+                that.currentClassChange();
+            }).siblings().fadeOut(this.o.speed);
         }
     });
-
     $.fn.slide = function(option) {
         new Slide($(this), option);
     };
