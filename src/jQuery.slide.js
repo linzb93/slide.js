@@ -1,18 +1,19 @@
 ;(function($) {
     //default option
     var d = {
-        dir: 'horizontal',      //滚动方向（水平或竖直）
-        speed: 500,             //滚动速度
-        prev: '',               //上翻页按钮
-        next: '',               //下翻页按钮
-        effect: 'slide',        //效果
-        loop: true,             //循环播放
-        perGroup: 1,            //显示数量
-        perSlideView: 1,        //每次滚动的数量
-        autoPlay: 0,            //自动滚动的时间间隔
-        pagination: '',         //分页器
-        paginationType: 'dot',  //分页器类型
-        wheel: false            //鼠标滚轮滚动
+        dir: 'horizontal',         //滚动方向（水平或竖直）
+        speed: 500,                //滚动速度
+        prev: '',                  //上翻页按钮
+        next: '',                  //下翻页按钮
+        effect: 'slide',           //效果
+        loop: true,                //循环播放
+        perGroup: 1,               //显示数量
+        perSlideView: 1,           //每次滚动的数量
+        autoPlay: 0,               //自动滚动的时间间隔
+        pagination: '',            //分页器
+        paginationType: 'dot',     //分页器类型
+        paginationEvent: 'click',  //分页器切换事件
+        wheel: false               //鼠标滚轮滚动
     };
 
     //class name
@@ -67,7 +68,8 @@
         }
         var effectArr = ['slide', 'carousel', 'fullPage', 'fade'],
             paginationArr = ['dot', 'num', 'outer'],
-            dirArr = ['horizontal', 'vertical'];
+            dirArr = ['horizontal', 'vertical'],
+            pagiEventArr = ['click', 'hover'];
         var errorMsg = function(opt) {
             if (opt === '$this') {
                 return '没有找到轮播组件';
@@ -173,9 +175,10 @@
         },
 
         bindEvent: function() {
-            var that = this;
+            var that = this,
+            event = this.o.paginationEvent;
             if (this.pageChild) {
-                this.pageChild.on('click', function() {
+                this.pageChild.on(event, function() {
                     if (that.counter === $(this).index()) {
                         return;
                     }
@@ -183,10 +186,10 @@
                 });
             }
             if (this.btnPrev || this.btnNext) {
-                this.btnPrev.on('click', function() {
+                this.btnPrev.on(event, function() {
                     that.slidePrev();
                 });
-                this.btnNext.on('click', function() {
+                this.btnNext.on(event, function() {
                     that.slideNext();
                 });
             }
@@ -249,20 +252,17 @@
         },
 
         singlePageHandler: function(btnDir, num) {
-            console.log(this.lock)
             if (this.lock) {
                 return;
             }
             this.lock = true;
             if (btnDir === 'prev') {
-                console.log(this.counter)
-                if(!this.o.loop && this.counter === 0){
+                if(this.counter === 0){
                     return;
                 }
                 this.nextCounter = this.counter - 1;
             } else if (btnDir === 'next') {
-                console.log(this.counter)
-                if(!this.o.loop && this.counter === this.length - 1){
+                if(this.counter === this.length - 1){
                     return;
                 }
                 this.nextCounter = this.counter + 1;
@@ -338,9 +338,6 @@
         //执行轮播。下同
         slideSinglePage: function(nextCo) {
             var that = this;
-            if (this.o.loop) {
-                nextCo++;
-            }
             this.o.dir === 'horizontal' ?
                 this.list.animate({
                     left: -nextCo * that.liSize
