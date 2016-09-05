@@ -1,10 +1,9 @@
 /*
  * jQuery.slide.js V2.1
- * slider framework on jQuery
  *
  * https://github.com/linzb93/jquery.slide.js
- * @license MIT licensed
  * API https://github.com/linzb93/jquery.slide.js/blob/master/doc/API.md
+ * @license MIT licensed
  *
  * Copyright (C) 2016 linzb93
  *
@@ -33,7 +32,13 @@
     //class name
     var CUR_CLASS_NAME = 'slide-active';
 
-    function init(option) {
+    /*
+     * @class Slide
+     * @param {$(this)} [$this]
+     * @param {Object} [option]
+     */
+    function Slide($this, option) {
+        this.$this = $this;
         var o = $.extend({}, d, option);
         this.o = o;
 
@@ -52,15 +57,7 @@
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
 
         errorDetection(this);
-        this.createStyle();
-        if (this.o.pagination) {
-            this.createPagination();
-        }
-        if (this.o.effect === 'slide' && this.o.loop) {
-            this.duplicateList();
-        }
-        this.bindEvent();
-        this.setAutoPlay();
+        this.init();
     }
 
     /*
@@ -94,11 +91,13 @@
             speed: typeof ele.o.speed !== 'number' || ele.o.speed <= 100,
             effect: (ele.o.perGroup > 1 && ele.o.effect !== 'carousel') ||
                     effectArr.indexOf(ele.o.effect) < 0,
+            loop: typeof ele.o.loop !== 'boolean',
             perGroup: typeof ele.o.perGroup !== 'number' || ele.o.perGroup < 1,
             perSlideView: typeof ele.o.perSlideView !== 'number' || ele.o.perSlideView < 1,
             autoPlay: typeof ele.o.autoPlay !== 'number' || ele.o.autoPlay < 0,
             paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
-            wheel: typeof ele.o.wheel !== 'boolean'
+            wheel: typeof ele.o.wheel !== 'boolean',
+            stopOnHover: typeof ele.o.wheel !== 'boolean'
         };
         for (var prop in booleanArr) {
             if (booleanArr[prop]) {
@@ -107,44 +106,41 @@
         }
     }
 
-    /*
-     * @class Slide
-     * @param {$(this)} [$this]
-     * @param {Object} [option]
-     */
-    function Slide($this, option) {
-        this.$this = $this;
-        init.call(this, option);
-    }
-
     $.extend(Slide.prototype, {
-        //初始化轮播样式
-        createStyle: function() {
+        init: function() {
             var that = this;
             if (this.o.effect === 'fade') {
                 this.$this.width(this.liW).height(this.liH);
                 this.$list.addClass('slide-fade');
                 this.$li.first().show();
-                return;
-            }
-
-            if (this.o.effect === 'fullPage') {
-                this.$li.width($("body").width()).height($("body").height());
-                this.liW = this.$li.width();
-                this.liH = this.$li.height();
-                this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
-            }
-
-            if (this.o.dir === 'horizontal') {
-                this.$this.width(that.liW * this.o.perGroup);
-                this.$list.width(that.liW * that.o.perSlideView * that.length);
             } else {
-                this.$this.height(that.liH * this.o.perGroup);
-                this.$list.height(that.liH * that.o.perSlideView * that.length);
+                if (this.o.effect === 'fullPage') {
+                    this.$li.width($("body").width()).height($("body").height());
+                    this.liW = this.$li.width();
+                    this.liH = this.$li.height();
+                    this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
+                }
+
+                if (this.o.dir === 'horizontal') {
+                    this.$this.width(that.liW * this.o.perGroup);
+                    this.$list.width(that.liW * that.o.perSlideView * that.length);
+                } else {
+                    this.$this.height(that.liH * this.o.perGroup);
+                    this.$list.height(that.liH * that.o.perSlideView * that.length);
+                }
+
+                this.$list.addClass('slide-' + that.o.dir);
+                this.$li.first().addClass(CUR_CLASS_NAME);
             }
 
-            this.$list.addClass('slide-' + that.o.dir);
-            this.$li.first().addClass(CUR_CLASS_NAME);
+            if (this.o.pagination) {
+                this.createPagination();
+            }
+            if (this.o.effect === 'slide' && this.o.loop) {
+                this.duplicateList();
+            }
+            this.bindEvent();
+            this.setAutoPlay();
         },
 
         //创建分页器
@@ -210,7 +206,6 @@
             }
 
             if (this.o.effect === 'fullPage') {
-
                 //全屏模式下绑定鼠标滚轮事件
                 $(document).on('mousewheel DOMMouseScroll', function(e) {
                     if (!that.o.wheel || that.lock) {
@@ -268,7 +263,10 @@
 
         //轮播处理的入口
         totalHandler: function(btnDir, num) {
-            var that = this;
+            if (this.lock) {
+                return;
+            }
+            this.lock = true;
             switch (this.o.effect) {
                 case 'slide':
                     this.singlePageHandler(btnDir, num);
@@ -313,10 +311,6 @@
         },
 
         singlePageHandler: function(btnDir, num) {
-            if (this.lock) {
-                return;
-            }
-            this.lock = true;
             if (btnDir === 'prev') {
                 if (!this.o.loop && this.curIndex === 0) {
                     this.lock = false;
