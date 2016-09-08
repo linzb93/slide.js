@@ -165,8 +165,8 @@
         fullPageReset: function() {
             var that = this;
             this.$li.width($('body').width()).height($('body').height());
-            this.liW = this.li.width();
-            this.liH = this.li.height();
+            this.liW = this.$li.width();
+            this.liH = this.$li.height();
             this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
             if (this.o.dir === 'horizontal') {
                 this.$list.css({
@@ -225,7 +225,7 @@
             }
 
             //鼠标悬停在轮播上方时暂停自动播放，移出时继续自动播放
-            if (this.o.stopOnHover) {
+            if (this.o.stopOnHover && this.o.autoPlay) {
                 this.$this.on({
                     'mouseover': function() {
                         clearInterval(that.timer);
@@ -263,10 +263,12 @@
 
         //轮播处理的入口
         totalHandler: function(btnDir, num) {
-            if (this.lock) {
-                return;
+            if (this.o.effect !== 'fullPage') {
+                if (this.lock) {
+                    return;
+                }
+                this.lock = true;
             }
-            this.lock = true;
             switch (this.o.effect) {
                 case 'slide':
                     this.singlePageHandler(btnDir, num);
@@ -345,10 +347,14 @@
             if (btnDir === 'prev') {
                 if (this.curIndex > 0 || (this.curIndex === 0 && this.o.loop)) {
                     this.slideFade(this.curIndex - 1);
+                } else {
+                    this.lock = false;
                 }
             } else if (btnDir === 'next') {
                 if (this.curIndex < this.length - 1 || (this.curIndex === this.length - 1 && this.o.loop)) {
                     this.slideFade(this.curIndex + 1);
+                } else {
+                    this.lock = false;
                 }
             } else if (btnDir === 'to') {
                 this.slideFade(num);
