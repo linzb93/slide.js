@@ -16,19 +16,21 @@ $('.slide-wrapper').slide({
 
 以下是API一览表
 
-|       参数       |   类型    |     默认值      |                   可选值                    |    含义    |   备注   |
-| :------------: | :-----: | :----------: | :--------------------------------------: | :------: | :----: |
-|      dir       | String  | ‘horizontal’ |                'vertical'                |   滚动方向   |        |
-|     speed      | Number  |     500      |                   800                    |   滚动速度   |        |
-|      prev      | String  |     null     |                 '.prev'                  |  前翻页按钮   |        |
-|      next      | String  |     null     |                 '.next'                  |  后翻页按钮   |        |
-|     effect     | String  |   'slide'    | 'carousel'(多页)、'fullPage'(全屏)、'fade'(焦点) |   轮播模式   |        |
-|    perGroup    | Number  |      1       |                    3                     |   显示数量   |        |
-|  perSlideView  | Number  |      1       |                    3                     | 每次滚动的数量  |        |
-|    autoPlay    | Number  |      0       |                   3000                   |  轮播时间间隔  | 大于0时有效 |
-|   pagination   | String  |     null     |              '.pagination'               |   分页器    |        |
-| paginationType | String  |    'dot'     |         'num'(数字)、'outer'(外部分页器)         |  分页器类型   |        |
-|     wheel      | Boolean |    false     |                   true                   | 使用鼠标滚轮滚动 |        |
+|       参数       |   类型    |     默认值      |                   可选值                    |           含义           |   备注   |
+| :------------: | :-----: | :----------: | :--------------------------------------: | :--------------------: | :----: |
+|      dir       | String  | ‘horizontal’ |                'vertical'                |          滚动方向          |        |
+|     speed      | Number  |     500      |                   800                    |          滚动速度          |        |
+|      prev      | String  |     null     |                 '.prev'                  |         前翻页按钮          |        |
+|      next      | String  |     null     |                 '.next'                  |         后翻页按钮          |        |
+|     effect     | String  |   'slide'    | 'carousel'(多页)、'fullPage'(全屏)、'fade'(焦点) |          轮播模式          |        |
+|    perGroup    | Number  |      1       |                    3                     |          显示数量          |        |
+|  perSlideView  | Number  |      1       |                    3                     |        每次滚动的数量         |        |
+|    autoPlay    | Number  |      0       |                   3000                   |         轮播时间间隔         | 大于0时有效 |
+|   pagination   | String  |     null     |              '.pagination'               |          分页器           |        |
+| paginationType | String  |    'dot'     |         'num'(数字)、'outer'(外部分页器)         |         分页器类型          |        |
+|     wheel      | Boolean |    false     |                   true                   |        使用鼠标滚轮滚动        |        |
+|      loop      | Boolean |     true     |                  false                   |          循环播放          | v2.1添加 |
+|  stopOnHover   | Boolean |     true     |                  false                   | 鼠标悬停在轮播上方时暂停播放，移出时继续播放 | v2.1添加 |
 
 
 
