@@ -26,6 +26,7 @@
         paginationType: 'dot',     //分页器类型
         paginationEvent: 'click',  //分页器切换事件
         wheel: false,              //鼠标滚轮滚动
+        lazyload: false,           // 图片懒加载
         stopOnHover: true          //鼠标悬停在轮播上方时暂停自动播放
     };
 
@@ -45,8 +46,8 @@
         this.$pagination = $(this.o.pagination);
         this.$list = this.$this.children('ul');
         this.$li = this.$list.children('li');
-        this.liW = this.$li.width();
-        this.liH = this.$li.height();
+        this.liW = this.$li.outerWidth(true);
+        this.liH = this.$li.outerHeight(true);
         this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
         this.length = Math.ceil((this.$li.length - this.o.perGroup) / this.o.perSlideView) + 1;
 
@@ -56,54 +57,7 @@
         this.nextIndex = 0;
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
 
-        errorDetection(this);
         this.init();
-    }
-
-    /*
-     * 错误检测
-     * @param {this} [ele] ,下同
-     */
-    function errorDetection(ele) {
-        if (document.documentMode < 10) {
-            alert('请勿使用低版本浏览器进行开发！');
-        }
-        var effectArr = ['slide', 'carousel', 'fullPage', 'fade'],
-            paginationArr = ['dot', 'num', 'outer'],
-            dirArr = ['horizontal', 'vertical'],
-            pagiEventArr = ['click', 'hover'];
-        var errorMsg = function(opt) {
-            if (opt === '$this') {
-                return '没有找到轮播组件';
-            }
-            var parentNode = ele.$this.parent(),
-                idClass = '';
-            if (!!parentNode.attr('id')) {
-                idClass = ele.$this.parent().attr('id');
-            } else {
-                idClass = ele.$this.parent().attr('class');
-            }
-            return idClass + '的' + opt + '值有误，请重新填写';
-        };
-        var booleanArr = {
-            $this: !ele.$this,
-            dir: dirArr.indexOf(ele.o.dir) < 0,
-            speed: typeof ele.o.speed !== 'number' || ele.o.speed <= 100,
-            effect: (ele.o.perGroup > 1 && ele.o.effect !== 'carousel') ||
-                    effectArr.indexOf(ele.o.effect) < 0,
-            loop: typeof ele.o.loop !== 'boolean',
-            perGroup: typeof ele.o.perGroup !== 'number' || ele.o.perGroup < 1,
-            perSlideView: typeof ele.o.perSlideView !== 'number' || ele.o.perSlideView < 1,
-            autoPlay: typeof ele.o.autoPlay !== 'number' || ele.o.autoPlay < 0,
-            paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
-            wheel: typeof ele.o.wheel !== 'boolean',
-            stopOnHover: typeof ele.o.wheel !== 'boolean'
-        };
-        for (var prop in booleanArr) {
-            if (booleanArr[prop]) {
-                console.warn(errorMsg(prop));
-            }
-        }
     }
 
     $.extend(Slide.prototype, {
@@ -135,6 +89,10 @@
 
             if (this.o.pagination) {
                 this.createPagination();
+            }
+            if (this.o.lazyload) {
+                lazyloadHandler(1);
+                lazyloadHandler(-1);
             }
             if (this.o.effect === 'slide' && this.o.loop) {
                 this.duplicateList();
@@ -376,6 +334,14 @@
                     height: that.liH * (that.length + 2)
                 });
             this.$list.children('li').last().removeClass(CUR_CLASS_NAME);
+        },
+
+        lazyloadHandler: function(num) {
+            var $img = this.$li.eq(num).find('img');
+            if ($img.data('src')) {
+                $img.attr('src', $img.data('src'));
+                $img.removeData('src');
+            }
         },
 
         //执行滚动后切换当前类的class
