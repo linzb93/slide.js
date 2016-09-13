@@ -1,7 +1,5 @@
 # 关于 jquery.slide.js
 
-#jquery.slide.js目前暂时不可用
-
 ##简介
 jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
 
