@@ -27,11 +27,12 @@
         paginationEvent: 'click',  //分页器切换事件
         wheel: false,              //鼠标滚轮滚动
         lazyload: false,           // 图片懒加载
-        stopOnHover: true          //鼠标悬停在轮播上方时暂停自动播放
+        stopOnHover: true,         //鼠标悬停在轮播上方时暂停自动播放
+        showWidget: false          //鼠标悬停在轮播上方时显示控件，移除时隐藏
     };
 
     //class name
-    var CUR_CLASS_NAME = 'slide-active';
+    var BTN_DISABLED_CLASS_NAME = 'slide-btn-disabled';
 
     /*
      * @class Slide
@@ -43,6 +44,8 @@
         var o = $.extend({}, d, option);
         this.o = o;
 
+        this.$btnPrev = $(this.o.prev);
+        this.$btnNext = $(this.o.next);
         this.$pagination = $(this.o.pagination);
         this.$list = this.$this.children('ul');
         this.$li = this.$list.children('li');
@@ -84,7 +87,6 @@
                 }
 
                 this.$list.addClass('slide-' + that.o.dir);
-                this.$li.first().addClass(CUR_CLASS_NAME);
             }
 
             if (this.o.pagination) {
@@ -146,7 +148,7 @@
             var that = this,
                 event = this.o.paginationEvent;
             if (this.$pageChild) {
-                this.$pageChild.on(event, function() {
+                this.$pagination.on(event, 'a', function() {
                     if (that.curIndex === $(this).index()) {
                         return;
                     }
@@ -155,10 +157,10 @@
             }
 
             if (this.o.prev || this.o.next) {
-                $(this.o.prev).on(event, function() {
+                this.$btnPrev.on(event, function() {
                     that.slidePrev();
                 });
-                $(this.o.next).on(event, function() {
+                this.$btnNext.on(event, function() {
                     that.slideNext();
                 });
             }
@@ -178,22 +180,37 @@
 
                 //窗口缩放时重置轮播
                 $(window).on('resize', function() {
-                    that.fullPageReset();
+                    if (that.lock) {
+                        return;
+                    }
+                    that.lock = true;
+                    setTimeout(function() {
+                        that.fullPageReset();
+                        that.lock = false;
+                    }, 500);
                 });
             }
 
             //鼠标悬停在轮播上方时暂停自动播放，移出时继续自动播放
-            if (this.o.stopOnHover && this.o.autoPlay) {
-                this.$this.on({
-                    'mouseover': function() {
+            this.$this.on({
+                'mouseenter': function() {
+                    if (that.o.stopOnHover && that.o.autoPlay) {
                         clearInterval(that.timer);
                         that.$list.stop(true, true);
-                    },
-                    'mouseout': function() {
+                    }
+                    if (that.o.showWidget) {
+                        that.toggleWidget('show');
+                    }
+                },
+                'mouseleave': function() {
+                    if (that.o.stopOnHover && that.o.autoPlay) {
                         that.setAutoPlay();
                     }
-                });
-            }
+                    if (that.o.showWidget) {
+                        that.toggleWidget('hide');
+                    }
+                }
+            });
         },
 
         //自动播放
@@ -333,7 +350,19 @@
                     top: -that.liH + 'px',
                     height: that.liH * (that.length + 2)
                 });
-            this.$list.children('li').last().removeClass(CUR_CLASS_NAME);
+        },
+
+        toggleWidget: function(state){
+            //TODO: 鼠标放在控件上会导致控件被隐藏，需要优化
+            if (state === 'hide') {
+                this.$btnPrev.fadeOut();
+                this.$btnNext.fadeOut();
+                this.$pagination.fadeOut();
+            } else {
+                this.$btnPrev.fadeIn();
+                this.$btnNext.fadeIn();
+                this.$pagination.fadeIn();
+            }
         },
 
         lazyloadHandler: function(num) {
@@ -346,7 +375,6 @@
 
         //执行滚动后切换当前类的class
         currentClassChange: function() {
-            this.$li.eq(this.curIndex).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
             if (this.o.pagination) {
                 this.$pageChild.eq(this.curIndex).addClass('on').siblings().removeClass('on');
             }
@@ -396,6 +424,16 @@
         //轮播执行后的回调函数
         slideCallBack: function(num) {
             this.curIndex = num;
+            if (!this.o.loop) {
+                if (this.curIndex === 0) {
+                    this.$btnPrev.addClass(BTN_DISABLED_CLASS_NAME)
+                } else if (this.curIndex === this.length - 1) {
+                    this.$btnNext.addClass(BTN_DISABLED_CLASS_NAME)
+                } else {
+                    this.$btnPrev.removeClass(BTN_DISABLED_CLASS_NAME);
+                    this.$btnNext.removeClass(BTN_DISABLED_CLASS_NAME);
+                }
+            }
             if (this.o.effect === 'slide') {
                 var aniDir = this.o.dir === 'horizontal' ? 'left' : 'top';
                 if (this.o.loop) {
