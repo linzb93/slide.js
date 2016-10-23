@@ -55,7 +55,6 @@
 ####其他：
 
 1. 所有非原型的方法请写在function Slide(){}和原型方法之间；
-2. 所有错误检测请写在 function errorDetection(){}里面。
 
 
 

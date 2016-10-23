@@ -14,26 +14,29 @@ $('.slide-wrapper').slide({
 
 在分页器里，所有的分页按钮都是a标签，没有class。
 
-以下是API一览表
+以下是API一览表[^1]:
 
-|       参数       |   类型    |     默认值      |                   可选值                    |           含义           |   备注   |
-| :------------: | :-----: | :----------: | :--------------------------------------: | :--------------------: | :----: |
-|      dir       | String  | ‘horizontal’ |                'vertical'                |          滚动方向          |        |
-|     speed      | Number  |     500      |                   800                    |          滚动速度          |        |
-|      prev      | String  |     null     |                 '.prev'                  |         前翻页按钮          |        |
-|      next      | String  |     null     |                 '.next'                  |         后翻页按钮          |        |
-|     effect     | String  |   'slide'    | 'carousel'(多页)、'fullPage'(全屏)、'fade'(焦点) |          轮播模式          |        |
-|    perGroup    | Number  |      1       |                    3                     |          显示数量          |        |
-|  perSlideView  | Number  |      1       |                    3                     |        每次滚动的数量         |        |
-|    autoPlay    | Number  |      0       |                   3000                   |         轮播时间间隔         | 大于0时有效 |
-|   pagination   | String  |     null     |              '.pagination'               |          分页器           |        |
-| paginationType | String  |    'dot'     |         'num'(数字)、'outer'(外部分页器)         |         分页器类型          |        |
-|     wheel      | Boolean |    false     |                   true                   |        使用鼠标滚轮滚动        |        |
-|      loop      | Boolean |     true     |                  false                   |          循环播放          | v2.1添加 |
-|  stopOnHover   | Boolean |     true     |                  false                   | 鼠标悬停在轮播上方时暂停播放，移出时继续播放 | v2.1添加 |
+|       参数        |    类型    |     默认值      |                   可选值                    |          含义           |                  备注                   |
+| :-------------: | :------: | :----------: | :--------------------------------------: | :-------------------: | :-----------------------------------: |
+|       dir       |  String  |     ‘h’      |                   'v'                    |         滚动方向          | 原先可选值是‘horizontal’和‘vertical’，V2.2后简写 |
+|      speed      |  Number  |     500      |                   800                    |         滚动速度          |                                       |
+|      prev       |  String  |     null     |                 '.prev'                  |         前翻页按钮         |                                       |
+|      next       |  String  |     null     |                 '.next'                  |         后翻页按钮         |                                       |
+|     effect      |  String  |   'slide'    | 'carousel'(多页)、'fullPage'(全屏)、'fade'(焦点) |         轮播模式          |                                       |
+|    perGroup     |  Number  |      1       |                    3                     |         显示数量          |                                       |
+|  perSlideView   |  Number  |      1       |                    3                     |        每次滚动的数量        |                                       |
+|    autoPlay     |  Number  |      0       |                   3000                   |        轮播时间间隔         |                大于0时有效                 |
+|   pagination    |  String  |     null     |              '.pagination'               |          分页器          |                                       |
+| paginationType  |  String  |    'dot'     |         'num'(数字)、'outer'(外部分页器)         |         分页器类型         |                                       |
+|  duplicateEdge  | Boolean  |     true     |                  false                   |    单页模式下复制头尾元素[^2]    |                V2.2添加                 |
+|    lazyload     | Boolean  |    false     |                   true                   |         图片懒加载         |                V2.2添加                 |
+|   showWidget    | Boolean  |    false     |                   true                   | 鼠标悬停在轮播上方显示控件，移出时隐藏控件 |                V2.2添加                 |
+| beforeSlideFunc | Function | function(){} |                                          |      执行轮播前触发的函数       |                V2.2添加                 |
+| afterSlideFunc  | Function | function(){} |                                          |      执行轮播后触发的函数       |                V2.2添加                 |
 
 
 
 
 
-_注：（1）所有新增的和修改的变量都会在“备注”一列中注明更新的版本。_
+[^1]: 所有新增的和修改的变量都会在“备注”一列中注明更新的版本。
+[^2]: 像标签切换的动画，不需要复制头尾元素，详见demo中的“标签切换”。

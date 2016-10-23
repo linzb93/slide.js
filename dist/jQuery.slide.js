@@ -1,36 +1,34 @@
 /*
- * jQuery.slide.js V2.1
+ * jQuery.slide.js V2.2
  *
  * https://github.com/linzb93/jquery.slide.js
- * API https://github.com/linzb93/jquery.slide.js/blob/master/doc/API.md
  * @license MIT licensed
  *
  * Copyright (C) 2016 linzb93
  *
- * Date: 2016-09-11
+ * Date: 2016-10-23
  */
 
 ;(function($) {
     //default option
     var d = {
-        dir: 'horizontal',         //滚动方向（水平或竖直）
-        speed: 500,                //滚动速度
-        prev: '',                  //上翻页按钮
-        next: '',                  //下翻页按钮
-        effect: 'slide',           //效果
-        loop: true,                //循环播放
-        perGroup: 1,               //显示数量
-        perSlideView: 1,           //每次滚动的数量
-        autoPlay: 0,               //自动滚动的时间间隔
-        pagination: '',            //分页器
-        paginationType: 'dot',     //分页器类型
-        paginationEvent: 'click',  //分页器切换事件
-        wheel: false,              //鼠标滚轮滚动
-        stopOnHover: true          //鼠标悬停在轮播上方时暂停自动播放
+        dir: 'h',
+        speed: 500,
+        prev: '',
+        next: '',
+        effect: 'slide',
+        perGroup: 1,
+        perSlideView: 1,
+        autoPlay: 0,
+        pagination: '',
+        paginationType: 'dot',
+        paginationEvent: 'click',
+        duplicateEdge: true,
+        lazyload: false,
+        showWidget: false,
+        beforeSlideFunc: function() {},
+        afterSlideFunc: function() {}
     };
-
-    //class name
-    var CUR_CLASS_NAME = 'slide-active';
 
     /*
      * @class Slide
@@ -39,107 +37,61 @@
      */
     function Slide($this, option) {
         this.$this = $this;
-        var o = $.extend({}, d, option);
-        this.o = o;
+        this.o = $.extend({}, d, option);
 
+        this.$btnPrev = $(this.o.prev);
+        this.$btnNext = $(this.o.next);
         this.$pagination = $(this.o.pagination);
         this.$list = this.$this.children('ul');
         this.$li = this.$list.children('li');
-        this.liW = this.$li.width();
-        this.liH = this.$li.height();
-        this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
+        this.liSize = this.o.dir === 'h' ? this.$li.outerWidth(true) : this.$li.outerHeight(true);
         this.length = Math.ceil((this.$li.length - this.o.perGroup) / this.o.perSlideView) + 1;
 
         this.$pageChild = null; //pagination's childnode
         this.timer = null;
         this.curIndex = 0;
-        this.nextIndex = 0;
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
+        if (this.o.prev && this.o.pagination) {
+            this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
+        } else if (this.o.prev && !this.o.pagination) {
+            this.$widget = this.$btnPrev.add(this.$btnNext);
+        } else if (!this.o.prev && this.o.pagination) {
+            this.$widget = this.pagination;
+        }
 
-        errorDetection(this);
         this.init();
     }
 
-    /*
-     * 错误检测
-     * @param {this} [ele] ,下同
-     */
-    function errorDetection(ele) {
-        if (document.documentMode < 10) {
-            alert('请勿使用低版本浏览器进行开发！');
-        }
-        var effectArr = ['slide', 'carousel', 'fullPage', 'fade'],
-            paginationArr = ['dot', 'num', 'outer'],
-            dirArr = ['horizontal', 'vertical'],
-            pagiEventArr = ['click', 'hover'];
-        var errorMsg = function(opt) {
-            if (opt === '$this') {
-                return '没有找到轮播组件';
-            }
-            var parentNode = ele.$this.parent(),
-                idClass = '';
-            if (!!parentNode.attr('id')) {
-                idClass = ele.$this.parent().attr('id');
-            } else {
-                idClass = ele.$this.parent().attr('class');
-            }
-            return idClass + '的' + opt + '值有误，请重新填写';
-        };
-        var booleanArr = {
-            $this: !ele.$this,
-            dir: dirArr.indexOf(ele.o.dir) < 0,
-            speed: typeof ele.o.speed !== 'number' || ele.o.speed <= 100,
-            effect: (ele.o.perGroup > 1 && ele.o.effect !== 'carousel') ||
-                    effectArr.indexOf(ele.o.effect) < 0,
-            loop: typeof ele.o.loop !== 'boolean',
-            perGroup: typeof ele.o.perGroup !== 'number' || ele.o.perGroup < 1,
-            perSlideView: typeof ele.o.perSlideView !== 'number' || ele.o.perSlideView < 1,
-            autoPlay: typeof ele.o.autoPlay !== 'number' || ele.o.autoPlay < 0,
-            paginationType: paginationArr.indexOf(ele.o.paginationType) < 0,
-            wheel: typeof ele.o.wheel !== 'boolean',
-            stopOnHover: typeof ele.o.wheel !== 'boolean'
-        };
-        for (var prop in booleanArr) {
-            if (booleanArr[prop]) {
-                console.warn(errorMsg(prop));
-            }
-        }
-    }
-
-    $.extend(Slide.prototype, {
+    Slide.prototype = {
         init: function() {
             var that = this;
             if (this.o.effect === 'fade') {
-                this.$this.width(this.liW).height(this.liH);
-                this.$list.addClass('slide-fade');
-                this.$li.first().show();
+                this.$this.width(this.liSize).height(this.$li.height());
+                this.$list.addClass('slide-pile');
+                this.$li.hide().first().show();
             } else {
-                if (this.o.effect === 'fullPage') {
-                    this.$li.width($("body").width()).height($("body").height());
-                    this.liW = this.$li.width();
-                    this.liH = this.$li.height();
-                    this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
-                }
-
-                if (this.o.dir === 'horizontal') {
-                    this.$this.width(that.liW * this.o.perGroup);
-                    this.$list.width(that.liW * that.o.perSlideView * that.length);
+                if (this.o.dir === 'h') {
+                    this.$this.width(this.liSize * this.o.perGroup);
+                    this.$list.width(this.liSize * this.$li.length);
                 } else {
-                    this.$this.height(that.liH * this.o.perGroup);
-                    this.$list.height(that.liH * that.o.perSlideView * that.length);
+                    this.$this.height(this.liSize * this.o.perGroup);
+                    this.$list.height(this.liSize * this.$li.length);
                 }
 
-                this.$list.addClass('slide-' + that.o.dir);
-                this.$li.first().addClass(CUR_CLASS_NAME);
+                this.$list.addClass('slide-' + this.o.dir);
             }
 
             if (this.o.pagination) {
                 this.createPagination();
             }
-            if (this.o.effect === 'slide' && this.o.loop) {
+            if (this.o.lazyload) {
+                this.lazyloadHandler(-1);
+                this.lazyloadHandler(0);
+            }
+            if (this.o.effect === 'slide' && this.o.duplicateEdge) {
                 this.duplicateList();
             }
-            this.bindEvent();
+            this.initEvent();
             this.setAutoPlay();
         },
 
@@ -161,81 +113,48 @@
             this.$pageChild.first().addClass('on');
         },
 
-        //fullPage模式下窗口调整时触发的方法
-        fullPageReset: function() {
-            var that = this;
-            this.$li.width($('body').width()).height($('body').height());
-            this.liW = this.$li.width();
-            this.liH = this.$li.height();
-            this.liSize = this.o.dir === 'horizontal' ? this.liW : this.liH;
-            if (this.o.dir === 'horizontal') {
-                this.$list.css({
-                    width: that.liW * that.length,
-                    left : -that.liW * that.curIndex
-                });
-                this.$this.width(that.liW);
-            } else {
-                this.$list.css({
-                    height: that.liH * that.length,
-                    top   : -that.liH * that.curIndex
-                });
-                this.$this.height(that.liH);
-            }
-        },
-
         //为轮播相关的操作绑定事件监听
-        bindEvent: function() {
+        initEvent: function() {
             var that = this,
                 event = this.o.paginationEvent;
             if (this.$pageChild) {
-                this.$pageChild.on(event, function() {
+                this.$pagination.on(event, 'a', function() {
                     if (that.curIndex === $(this).index()) {
                         return;
                     }
-                    that.slideTo($(this).index());
+                    that.totalHandler('to', $(this).index());
                 });
             }
 
             if (this.o.prev || this.o.next) {
-                $(this.o.prev).on(event, function() {
-                    that.slidePrev();
+                this.$btnPrev.on(event, function() {
+                    that.totalHandler('prev');
                 });
-                $(this.o.next).on(event, function() {
-                    that.slideNext();
-                });
-            }
-
-            if (this.o.effect === 'fullPage') {
-                //全屏模式下绑定鼠标滚轮事件
-                $(document).on('mousewheel DOMMouseScroll', function(e) {
-                    if (!that.o.wheel || that.lock) {
-                        return;
-                    }
-                    that.lock = true;
-                    e.preventDefault();
-                    (e.originalEvent.wheelDelta || -e.originalEvent.detail) > 0 ?
-                        that.slidePrev() :
-                        that.slideNext();
-                });
-
-                //窗口缩放时重置轮播
-                $(window).on('resize', function() {
-                    that.fullPageReset();
+                this.$btnNext.on(event, function() {
+                    that.totalHandler('next');
                 });
             }
 
             //鼠标悬停在轮播上方时暂停自动播放，移出时继续自动播放
-            if (this.o.stopOnHover && this.o.autoPlay) {
-                this.$this.on({
-                    'mouseover': function() {
+            this.$this.parent().on({
+                'mouseenter': function() {
+                    if (that.o.autoPlay) {
                         clearInterval(that.timer);
-                        that.$list.stop(true, true);
-                    },
-                    'mouseout': function() {
+                        that.$list.clearQueue();
+                    }
+                    if (that.o.showWidget) {
+                        that.toggleWidget('show');
+                    }
+                },
+                'mouseleave': function() {
+                    if (that.o.autoPlay) {
                         that.setAutoPlay();
                     }
-                });
-            }
+                    if (that.o.showWidget) {
+                        that.toggleWidget('hide');
+                    }
+                }
+            });
         },
 
         //自动播放
@@ -248,27 +167,8 @@
             }
         },
 
-        //向前滚动。下面的slideNext、slideTo方法类似
-        slidePrev: function() {
-            this.totalHandler('prev');
-        },
-
-        slideNext: function() {
-            this.totalHandler('next');
-        },
-
-        slideTo: function(num) {
-            this.totalHandler('to', num);
-        },
-
         //轮播处理的入口
         totalHandler: function(btnDir, num) {
-            if (this.o.effect !== 'fullPage') {
-                if (this.lock) {
-                    return;
-                }
-                this.lock = true;
-            }
             switch (this.o.effect) {
                 case 'slide':
                     this.singlePageHandler(btnDir, num);
@@ -276,89 +176,68 @@
                 case 'carousel':
                     this.carouselHandler(btnDir, num);
                     break;
-                case 'fullPage':
-                    this.fullPageHandler(btnDir, num);
-                    break;
                 case 'fade':
                     this.fadeHandler(btnDir, num);
                     break;
             }
         },
 
-        //默认处理轮播方式。singlePageHandler、carouselHandler、fullPageHandler、fadeHandler类似。
-        defaultPageHandler: function(btnDir, num) {
+        singlePageHandler: function(btnDir, num) {
+            if (this.lock) {
+                return;
+            }
             if (btnDir === 'prev') {
-                if (this.curIndex === 0) {
-                    if (this.o.loop) {
-                        this.nextIndex = this.length - 1;
-                    } else {
-                        return;
-                    }
-                } else {
-                    this.nextIndex = this.curIndex - 1;
+                if (!this.curIndex) {
+                    this.lock = true;
                 }
+                this.curIndex -= 1;
             } else if (btnDir === 'next') {
                 if (this.curIndex === this.length - 1) {
-                    if (this.o.loop) {
-                        this.nextIndex = 0;
-                    } else {
-                        return;
-                    }
-                } else {
-                    this.nextIndex = this.curIndex + 1;
+                    this.lock = true;
                 }
+                this.curIndex += 1;
             } else {
-                this.nextIndex = num;
+                this.curIndex = num;
             }
-        },
-
-        singlePageHandler: function(btnDir, num) {
-            if (btnDir === 'prev') {
-                if (!this.o.loop && this.curIndex === 0) {
-                    this.lock = false;
-                    return;
-                } else {
-                    this.nextIndex = this.curIndex - 1;
-                }
-            } else if (btnDir === 'next') {
-                if( !this.o.loop && this.curIndex === this.length - 1) {
-                    this.lock = false;
-                    return;
-                } else {
-                    this.nextIndex = this.curIndex + 1;
-                }
-            } else {
-                this.nextIndex = num;
-            }
-            this.slideSinglePage(this.nextIndex);
+            this.slidePage(this.curIndex);
         },
 
         carouselHandler: function(btnDir, num) {
-            this.defaultPageHandler(btnDir, num);
-            this.slideCarousel(this.nextIndex);
-        },
-
-        fullPageHandler: function(btnDir, num) {
-            this.defaultPageHandler(btnDir, num);
-            this.slideFullPage(this.nextIndex);
+            if (btnDir === 'prev') {
+                if (!this.curIndex) {
+                    this.curIndex = this.length - 1;
+                } else {
+                    this.curIndex -= 1;
+                }
+            } else if (btnDir === 'next') {
+                if (this.curIndex === this.length - 1) {
+                    this.curIndex = 0;
+                } else {
+                    this.curIndex += 1;
+                }
+            } else {
+                this.curIndex = num;
+            }
+            this.slidePage(this.curIndex);
         },
 
         fadeHandler: function(btnDir, num) {
             if (btnDir === 'prev') {
-                if (this.curIndex > 0 || (this.curIndex === 0 && this.o.loop)) {
-                    this.slideFade(this.curIndex - 1);
+                if (this.curIndex > 0) {
+                    this.curIndex --;
                 } else {
-                    this.lock = false;
+                    this.curIndex = this.length - 1;
                 }
             } else if (btnDir === 'next') {
-                if (this.curIndex < this.length - 1 || (this.curIndex === this.length - 1 && this.o.loop)) {
-                    this.slideFade(this.curIndex + 1);
+                if (this.curIndex < this.length - 1 ) {
+                    this.curIndex++;
                 } else {
-                    this.lock = false;
+                    this.curIndex = 0;
                 }
             } else if (btnDir === 'to') {
-                this.slideFade(num);
+                this.curIndex = num;
             }
+            this.slideFade(this.curIndex);
         },
 
         //单页循环模式下，复制轮播列表头尾两个元素
@@ -366,56 +245,68 @@
             var that = this;
             this.$li.last().clone().prependTo(this.$list);
             this.$li.first().clone().appendTo(this.$list);
-            this.o.dir === 'horizontal' ?
+            this.o.dir === 'h' ?
                 this.$list.css({
-                    left: -that.liW + 'px',
-                    width: that.liW * (that.length + 2)
+                    left: -this.liSize + 'px',
+                    width: this.liSize * (this.length + 2)
                 }) :
                 this.$list.css({
-                    top: -that.liH + 'px',
-                    height: that.liH * (that.length + 2)
+                    top: -this.liSize + 'px',
+                    height: this.liSize * (this.length + 2)
                 });
-            this.$list.children('li').last().removeClass(CUR_CLASS_NAME);
+        },
+
+        toggleWidget: function(state){
+            state === 'hide' ?
+            this.$widget.stop(true, true).fadeOut():
+            this.$widget.stop(true, true).fadeIn();
+        },
+
+        lazyloadHandler: function(num) {
+            for (var i = 0; i < this.o.perGroup; i++) {
+               this.$li.eq(this.curIndex * this.o.perSlideView + i).find('img').each(function() {
+                    if ($(this).data('src')) {
+                        $(this).attr('src', $(this).data('src'));
+                        $(this).removeAttr('data-src');
+                    }
+                });
+            }
         },
 
         //执行滚动后切换当前类的class
         currentClassChange: function() {
-            this.$li.eq(this.curIndex).addClass(CUR_CLASS_NAME).siblings().removeClass(CUR_CLASS_NAME);
             if (this.o.pagination) {
                 this.$pageChild.eq(this.curIndex).addClass('on').siblings().removeClass('on');
             }
         },
 
-        //默认执行轮播动画。slideSinglePage、slideCarousel、slideFullPage、slideFade类似。
-        defaultSinglePage: function(num) {
-            var that = this,
-                newNum = (this.o.effect === 'slide' && this.o.loop) ? num + 1 : num;
-            this.o.dir === 'horizontal' ?
-                this.$list.animate({
-                    left: -newNum * that.liSize * that.o.perSlideView
-                }, this.o.speed, function() {
-                    that.slideCallBack(num);
-                }) :
-                this.$list.animate({
-                    top: -newNum * that.liSize * that.o.perSlideView
-                }, this.o.speed, function() {
-                    that.slideCallBack(num);
-                });
+        doBeforeSlideFunc: function() {
+            if (this.o.lazyload) {
+                this.lazyloadHandler(this.curIndex);
+            }
+            this.o.beforeSlideFunc();
         },
 
-        slideSinglePage: function(num) {
-            this.defaultSinglePage(num);
-        },
-
-        slideCarousel: function(num) {
-            this.defaultSinglePage(num);
-        },
-
-        slideFullPage: function(num) {
-            this.defaultSinglePage(num);
+        slidePage: function(num) {
+            this.doBeforeSlideFunc();
+            var that = this;
+            var newnum = (this.o.effect === 'slide' && this.o.duplicateEdge) ? num + 1 : num;
+            var targetPos = -newnum * this.liSize * this.o.perSlideView;
+            this.o.dir === 'h' ?
+            this.$list.stop(true).animate({
+                left: targetPos
+            }, this.o.speed, function() {
+                that.slideCallBack();
+            }) :
+            this.$list.stop(true).animate({
+                top: targetPos
+            }, this.o.speed, function() {
+                that.slideCallBack();
+            });
         },
 
         slideFade: function(num) {
+            this.doBeforeSlideFunc();
             var that = this;
             if (num === this.length) {
                 num = 0;
@@ -423,32 +314,32 @@
                 num = this.length - 1;
             }
             this.$li.eq(num).fadeIn(this.o.speed, function() {
-                that.slideCallBack(num);
+                that.slideCallBack();
             }).siblings().fadeOut(this.o.speed);
         },
 
         //轮播执行后的回调函数
-        slideCallBack: function(num) {
-            this.curIndex = num;
+        slideCallBack: function() {
             if (this.o.effect === 'slide') {
-                var aniDir = this.o.dir === 'horizontal' ? 'left' : 'top';
-                if (this.o.loop) {
-                    if (this.curIndex < 0) {
-                        this.curIndex = this.length - 1;
-                        this.$list.css(aniDir, -this.liW * this.length);
-                    } else if (this.curIndex === this.length) {
-                        this.curIndex = 0;
-                        this.$list.css(aniDir, -this.liW);
-                    }
+                var aniDir = this.o.dir === 'h' ? 'left' : 'top';
+                if (this.curIndex === -1) {
+                    this.curIndex = this.length - 1;
+                    this.$list.css(aniDir, -this.liSize * this.length);
+                } else if (this.curIndex === this.length) {
+                    this.curIndex = 0;
+                    this.$list.css(aniDir, -this.liSize);
                 }
+                this.lock = false;
             }
             this.currentClassChange();
-            this.lock = false;
+            this.o.afterSlideFunc();
         }
-    });
+    };
 
     //调用插件
     $.fn.slide = function(option) {
-        new Slide($(this), option);
+        return this.each(function() {
+            new Slide($(this), option);
+        });
     };
 }(jQuery));

@@ -2,23 +2,22 @@
     position: relative;
     overflow: hidden;
 }
-.slide-horizontal {
+.slide-h {
     position: relative;
     left: 0;
 }
-.slide-horizontal li {
+.slide-h li {
     float: left;
 }
-.slide-vertical {
+.slide-v {
     position: relative;
     top: 0;
 }
-.slide-fade {
+.slide-pile {
     position: relative;
 }
-.slide-fade li {
+.slide-pile li {
     position: absolute;
     left: 0;
     top: 0;
-    display: none;
 }
