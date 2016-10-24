@@ -1,12 +1,12 @@
 /*
- * jQuery.slide.js V2.2
+ * jQuery.slide.js V2.3
  *
  * https://github.com/linzb93/jquery.slide.js
  * @license MIT licensed
  *
  * Copyright (C) 2016 linzb93
  *
- * Date: 2016-10-23
+ * Date: 2016-11-11
  */
 
 ;(function($) {
@@ -17,6 +17,7 @@
         prev: '',
         next: '',
         effect: 'slide',
+        marquee: false,
         perGroup: 1,
         perSlideView: 1,
         autoPlay: 0,
@@ -29,6 +30,10 @@
         beforeSlideFunc: function() {},
         afterSlideFunc: function() {}
     };
+
+    function getInnerImg($ele) {
+        return $ele.find('img').attr('src') || $ele.css('background-image').slice(5, -2);
+    }
 
     /*
      * @class Slide
@@ -51,6 +56,9 @@
         this.timer = null;
         this.curIndex = 0;
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
+        if (this.o.effect === 'slide' && this.o.marquee) {
+            this.o.effect = this.o.dir === 'h' ? 'leftmarquee' : 'topmarquee';
+        }
         if (this.o.prev && this.o.pagination) {
             this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
         } else if (this.o.prev && !this.o.pagination) {
@@ -70,23 +78,25 @@
                 this.$list.addClass('slide-pile');
                 this.$li.hide().first().show();
             } else {
+                var wrapperSize = this.liSize * this.o.perGroup,
+                    listSize = this.liSize * this.$li.length;
                 if (this.o.dir === 'h') {
-                    this.$this.width(this.liSize * this.o.perGroup);
-                    this.$list.width(this.liSize * this.$li.length);
+                    this.$this.width(wrapperSize);
+                    this.$list.width(listSize);
                 } else {
-                    this.$this.height(this.liSize * this.o.perGroup);
-                    this.$list.height(this.liSize * this.$li.length);
+                    this.$this.height(wrapperSize);
+                    this.$list.height(listSize);
                 }
 
                 this.$list.addClass('slide-' + this.o.dir);
             }
 
-            if (this.o.pagination) {
+            if (this.$pagination) {
                 this.createPagination();
             }
             if (this.o.lazyload) {
-                this.lazyloadHandler(-1);
                 this.lazyloadHandler(0);
+                this.lazyloadHandler(-1);
             }
             if (this.o.effect === 'slide' && this.o.duplicateEdge) {
                 this.duplicateList();
@@ -99,12 +109,21 @@
         createPagination: function() {
             var that = this;
             if (this.o.paginationType === 'outer') {
-                this.$pageChild = this.$pagination.children().length === this.length ?
-                    this.$pagination.children() : null;
+                this.$pageChild = this.$pagination.children();
             } else {
                 var tempHtml = '';
                 for (var i = 0, j; i < this.length; i++) {
-                    j = this.o.paginationType === 'num' ? i : '';
+                    switch (this.o.paginationType) {
+                        case 'dot':
+                            j = '';
+                            break;
+                        case 'num':
+                            j = i;
+                            break;
+                        case 'image':
+                            j = '<img src="' + getInnerImg(that.$li.eq(i)) + '">';
+                            break;
+                    }
                     tempHtml += '<a href="javascript:;">' + j + '</a>';
                 }
                 this.$pagination.append(tempHtml);
@@ -119,10 +138,11 @@
                 event = this.o.paginationEvent;
             if (this.$pageChild) {
                 this.$pagination.on(event, 'a', function() {
-                    if (that.curIndex === $(this).index()) {
+                    var index = $(this).index();
+                    if (that.curIndex === index) {
                         return;
                     }
-                    that.totalHandler('to', $(this).index());
+                    that.totalHandler('to', index);
                 });
             }
 
@@ -179,6 +199,10 @@
                 case 'fade':
                     this.fadeHandler(btnDir, num);
                     break;
+                case 'leftmarquee':
+                    break;
+                case 'topmarquee':
+                    break;
             }
         },
 
@@ -204,17 +228,9 @@
 
         carouselHandler: function(btnDir, num) {
             if (btnDir === 'prev') {
-                if (!this.curIndex) {
-                    this.curIndex = this.length - 1;
-                } else {
-                    this.curIndex -= 1;
-                }
+                this.curIndex = !this.curIndex ? this.length - 1 : this.curIndex - 1;
             } else if (btnDir === 'next') {
-                if (this.curIndex === this.length - 1) {
-                    this.curIndex = 0;
-                } else {
-                    this.curIndex += 1;
-                }
+                this.curIndex = this.curIndex === this.length - 1 ? 0 : this.curIndex + 1;
             } else {
                 this.curIndex = num;
             }
@@ -223,17 +239,9 @@
 
         fadeHandler: function(btnDir, num) {
             if (btnDir === 'prev') {
-                if (this.curIndex > 0) {
-                    this.curIndex --;
-                } else {
-                    this.curIndex = this.length - 1;
-                }
+                this.curIndex = this.curIndex ? this.curIndex - 1 : this.length - 1;
             } else if (btnDir === 'next') {
-                if (this.curIndex < this.length - 1 ) {
-                    this.curIndex++;
-                } else {
-                    this.curIndex = 0;
-                }
+                this.curIndex = this.curIndex < this.length - 1 ? this.curIndex + 1 : 0;
             } else if (btnDir === 'to') {
                 this.curIndex = num;
             }
@@ -243,8 +251,8 @@
         //单页循环模式下，复制轮播列表头尾两个元素
         duplicateList: function() {
             var that = this;
-            this.$li.last().clone().prependTo(this.$list);
             this.$li.first().clone().appendTo(this.$list);
+            this.$li.last().clone().prependTo(this.$list);
             this.o.dir === 'h' ?
                 this.$list.css({
                     left: -this.liSize + 'px',
@@ -275,8 +283,8 @@
 
         //执行滚动后切换当前类的class
         currentClassChange: function() {
-            if (this.o.pagination) {
-                this.$pageChild.eq(this.curIndex).addClass('on').siblings().removeClass('on');
+            if (this.$pagination) {
+                this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
             }
         },
 
