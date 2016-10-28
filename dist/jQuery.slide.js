@@ -6,7 +6,7 @@
  *
  * Copyright (C) 2016 linzb93
  *
- * Date: 2016-11-11
+ * Date: 2016-11-13
  */
 
 ;(function($) {
@@ -17,22 +17,22 @@
         prev: '',
         next: '',
         effect: 'slide',
-        marquee: false,
         perGroup: 1,
         perSlideView: 1,
         autoPlay: 0,
         pagination: '',
         paginationType: 'dot',
         paginationEvent: 'click',
+        paginationFollow: 'h',
         duplicateEdge: true,
         lazyload: false,
         showWidget: false,
-        beforeSlideFunc: function() {},
-        afterSlideFunc: function() {}
+        beforeSlideFunc: $.noop,
+        afterSlideFunc: $.noop
     };
 
     function getInnerImg($ele) {
-        return $ele.find('img').attr('src') || $ele.css('background-image').slice(5, -2);
+        return $ele.find('img').attr('src') || $ele.find('img').attr('data-src') || $ele.css('background-image').slice(5, -2);
     }
 
     /*
@@ -55,17 +55,9 @@
         this.$pageChild = null; //pagination's childnode
         this.timer = null;
         this.curIndex = 0;
+        this.imgLen = 0; //已经加载图片的轮播项数量
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
-        if (this.o.effect === 'slide' && this.o.marquee) {
-            this.o.effect = this.o.dir === 'h' ? 'leftmarquee' : 'topmarquee';
-        }
-        if (this.o.prev && this.o.pagination) {
-            this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
-        } else if (this.o.prev && !this.o.pagination) {
-            this.$widget = this.$btnPrev.add(this.$btnNext);
-        } else if (!this.o.prev && this.o.pagination) {
-            this.$widget = this.pagination;
-        }
+        this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
 
         this.init();
     }
@@ -80,6 +72,7 @@
             } else {
                 var wrapperSize = this.liSize * this.o.perGroup,
                     listSize = this.liSize * this.$li.length;
+                this.$this.addClass('slide-container');
                 if (this.o.dir === 'h') {
                     this.$this.width(wrapperSize);
                     this.$list.width(listSize);
@@ -96,21 +89,24 @@
             }
             if (this.o.lazyload) {
                 this.lazyloadHandler(0);
-                this.lazyloadHandler(-1);
+                if (this.o.effect === 'slide') {
+                    this.lazyloadHandler(-1);
+                }
             }
             if (this.o.effect === 'slide' && this.o.duplicateEdge) {
                 this.duplicateList();
             }
             this.initEvent();
             this.setAutoPlay();
+            if (this.o.effect === 'marquee') {
+                this.totalHandler();
+            }
         },
 
         //创建分页器
         createPagination: function() {
             var that = this;
-            if (this.o.paginationType === 'outer') {
-                this.$pageChild = this.$pagination.children();
-            } else {
+            if (!this.o.paginationType === 'outer') {
                 var tempHtml = '';
                 for (var i = 0, j; i < this.length; i++) {
                     switch (this.o.paginationType) {
@@ -127,9 +123,12 @@
                     tempHtml += '<a href="javascript:;">' + j + '</a>';
                 }
                 this.$pagination.append(tempHtml);
-                this.$pageChild = this.$pagination.children();
             }
+            this.$pageChild = this.$pagination.children();
             this.$pageChild.first().addClass('on');
+            if (this.o.paginationType === 'image') {
+                this.$pageChild.wrap('.slide-pagination-wrapper');
+            }
         },
 
         //为轮播相关的操作绑定事件监听
@@ -158,20 +157,23 @@
             //鼠标悬停在轮播上方时暂停自动播放，移出时继续自动播放
             this.$this.parent().on({
                 'mouseenter': function() {
-                    if (that.o.autoPlay) {
+                    if (that.o.autoPlay || that.o.effect === 'marquee') {
                         clearInterval(that.timer);
                         that.$list.clearQueue();
                     }
                     if (that.o.showWidget) {
-                        that.toggleWidget('show');
+                        that.$widget.stop(true, true).fadeIn();
                     }
                 },
                 'mouseleave': function() {
                     if (that.o.autoPlay) {
                         that.setAutoPlay();
                     }
+                    if (that.o.effect === 'marquee') {
+                        that.marqueeHandler()
+                    }
                     if (that.o.showWidget) {
-                        that.toggleWidget('hide');
+                        that.$widget.stop(true, true).fadeOut();
                     }
                 }
             });
@@ -199,9 +201,8 @@
                 case 'fade':
                     this.fadeHandler(btnDir, num);
                     break;
-                case 'leftmarquee':
-                    break;
-                case 'topmarquee':
+                case 'marquee':
+                    this.marqueeHandler();
                     break;
             }
         },
@@ -242,54 +243,64 @@
                 this.curIndex = this.curIndex ? this.curIndex - 1 : this.length - 1;
             } else if (btnDir === 'next') {
                 this.curIndex = this.curIndex < this.length - 1 ? this.curIndex + 1 : 0;
-            } else if (btnDir === 'to') {
+            } else {
                 this.curIndex = num;
             }
             this.slideFade(this.curIndex);
         },
 
+        marqueeHandler: function() {
+            var that = this;
+            this.timer = setInterval(function() {
+                if (that.curIndex < that.$li.length - that.o.perGroup) {
+                    that.slidePage(++that.curIndex);
+                } else {
+                    that.curIndex = -1;
+                    setTimeout(function() {
+                        if (that.o.dir === 'h') {
+                            that.$list.css('left', 0);
+                        } else {
+                            that.$list.css('top', 0);
+                        }
+                    }, that.o.speed)
+                }
+            }, that.o.speed + 20);
+        },
+
         //单页循环模式下，复制轮播列表头尾两个元素
         duplicateList: function() {
-            var that = this;
+            var that = this,
+                initPos = -this.liSize + 'px',
+                listSize = this.liSize * (this.length + 2);
             this.$li.first().clone().appendTo(this.$list);
             this.$li.last().clone().prependTo(this.$list);
             this.o.dir === 'h' ?
                 this.$list.css({
-                    left: -this.liSize + 'px',
-                    width: this.liSize * (this.length + 2)
+                    left: initPos,
+                    width: listSize
                 }) :
                 this.$list.css({
-                    top: -this.liSize + 'px',
-                    height: this.liSize * (this.length + 2)
+                    top: initPos,
+                    height: listSize
                 });
         },
 
-        toggleWidget: function(state){
-            state === 'hide' ?
-            this.$widget.stop(true, true).fadeOut():
-            this.$widget.stop(true, true).fadeIn();
-        },
-
         lazyloadHandler: function(num) {
+            var that = this;
             for (var i = 0; i < this.o.perGroup; i++) {
-               this.$li.eq(this.curIndex * this.o.perSlideView + i).find('img').each(function() {
-                    if ($(this).data('src')) {
+               this.$li.eq(num * this.o.perSlideView + i).find('img').each(function() {
+                    if ($(this).attr('data-src')) {
                         $(this).attr('src', $(this).data('src'));
                         $(this).removeAttr('data-src');
+                        that.imgLen++;
                     }
                 });
             }
         },
 
-        //执行滚动后切换当前类的class
-        currentClassChange: function() {
-            if (this.$pagination) {
-                this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
-            }
-        },
-
         doBeforeSlideFunc: function() {
-            if (this.o.lazyload) {
+            console.log(this.imgLen);
+            if (this.o.lazyload && this.imgLen <= this.$li.length) {
                 this.lazyloadHandler(this.curIndex);
             }
             this.o.beforeSlideFunc();
@@ -303,31 +314,35 @@
             this.o.dir === 'h' ?
             this.$list.stop(true).animate({
                 left: targetPos
-            }, this.o.speed, function() {
-                that.slideCallBack();
+            }, this.o.speed, 'linear', function() {
+                that.slideCallBack(num);
             }) :
             this.$list.stop(true).animate({
                 top: targetPos
-            }, this.o.speed, function() {
-                that.slideCallBack();
+            }, this.o.speed, 'linear', function() {
+                that.slideCallBack(num);
             });
         },
 
         slideFade: function(num) {
             this.doBeforeSlideFunc();
             var that = this;
-            if (num === this.length) {
-                num = 0;
-            } else if (num === -1) {
-                num = this.length - 1;
-            }
             this.$li.eq(num).fadeIn(this.o.speed, function() {
                 that.slideCallBack();
             }).siblings().fadeOut(this.o.speed);
         },
 
+        currentClassChange: function() {
+            if (this.$pagination) {
+                this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
+            }
+            if (this.o.paginationType === 'image' && this.o.paginationFollow) {
+                if ()
+            }
+        }
+
         //轮播执行后的回调函数
-        slideCallBack: function() {
+        slideCallBack: function(num) {
             if (this.o.effect === 'slide') {
                 var aniDir = this.o.dir === 'h' ? 'left' : 'top';
                 if (this.curIndex === -1) {
@@ -338,6 +353,8 @@
                     this.$list.css(aniDir, -this.liSize);
                 }
                 this.lock = false;
+            } else if (this.o.effect === 'marquee') {
+                this.curIndex = num;
             }
             this.currentClassChange();
             this.o.afterSlideFunc();
