@@ -106,7 +106,7 @@
         //创建分页器
         createPagination: function() {
             var that = this;
-            if (!this.o.paginationType === 'outer') {
+            if (!this.o.paginationType !== 'outer') {
                 var tempHtml = '';
                 for (var i = 0, j; i < this.length; i++) {
                     switch (this.o.paginationType) {
@@ -337,9 +337,9 @@
                 this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
             }
             if (this.o.paginationType === 'image' && this.o.paginationFollow) {
-                if ()
+                
             }
-        }
+        },
 
         //轮播执行后的回调函数
         slideCallBack: function(num) {
