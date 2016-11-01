@@ -24,12 +24,13 @@
         paginationType: 'dot',
         paginationEvent: 'click',
         paginationFollow: 'h',
-        duplicateEdge: true,
         lazyload: false,
         showWidget: false,
-        beforeSlideFunc: $.noop,
-        afterSlideFunc: $.noop
+        beforeSlideFunc: function() {},
+        afterSlideFunc: function() {}
     };
+
+    var PAGINATIONWRAPPER = 'slide-pagination-wrapper';
 
     function getInnerImg($ele) {
         return $ele.find('img').attr('src') || $ele.find('img').attr('data-src') || $ele.css('background-image').slice(5, -2);
@@ -58,6 +59,7 @@
         this.imgLen = 0; //已经加载图片的轮播项数量
         this.lock = false;      //避免用户操作过于频繁而使用上锁机制
         this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
+        this.duplicateEdge = !this.o.autoPlay && !this.o.next;
 
         this.init();
     }
@@ -93,7 +95,7 @@
                     this.lazyloadHandler(-1);
                 }
             }
-            if (this.o.effect === 'slide' && this.o.duplicateEdge) {
+            if (this.o.effect === 'slide' && this.duplicateEdge) {
                 this.duplicateList();
             }
             this.initEvent();
@@ -106,7 +108,7 @@
         //创建分页器
         createPagination: function() {
             var that = this;
-            if (!this.o.paginationType !== 'outer') {
+            if (this.o.paginationType != 'outer') {
                 var tempHtml = '';
                 for (var i = 0, j; i < this.length; i++) {
                     switch (this.o.paginationType) {
@@ -127,7 +129,12 @@
             this.$pageChild = this.$pagination.children();
             this.$pageChild.first().addClass('on');
             if (this.o.paginationType === 'image') {
-                this.$pageChild.wrap('.slide-pagination-wrapper');
+                this.$pageChild.wrapAll('<div class="' + PAGINATIONWRAPPER + '" />');
+                if (this.o.paginationFollow === 'h') {
+                    this.$pagination.find('.' + PAGINATIONWRAPPER).width(this.$pageChild.outerWidth(true) * this.$li.length);
+                } else {
+                    this.$pagination.find('.' + PAGINATIONWRAPPER).height(this.$pageChild.outerHeight(true) * this.$li.length);
+                }
             }
         },
 
@@ -299,7 +306,6 @@
         },
 
         doBeforeSlideFunc: function() {
-            console.log(this.imgLen);
             if (this.o.lazyload && this.imgLen <= this.$li.length) {
                 this.lazyloadHandler(this.curIndex);
             }
@@ -309,7 +315,7 @@
         slidePage: function(num) {
             this.doBeforeSlideFunc();
             var that = this;
-            var newnum = (this.o.effect === 'slide' && this.o.duplicateEdge) ? num + 1 : num;
+            var newnum = (this.o.effect === 'slide' && this.duplicateEdge) ? num + 1 : num;
             var targetPos = -newnum * this.liSize * this.o.perSlideView;
             this.o.dir === 'h' ?
             this.$list.stop(true).animate({
@@ -333,11 +339,24 @@
         },
 
         currentClassChange: function() {
+            var that = this;
             if (this.$pagination) {
                 this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
             }
             if (this.o.paginationType === 'image' && this.o.paginationFollow) {
-                
+                if (this.o.paginationFollow === 'h') {
+                    if (this.$pageChild.eq(this.curIndex).offset().left - this.$pagination.offset().left > this.$pagination.width()) {
+                        this.$pagination.find('.' + PAGINATIONWRAPPER).animate({
+                            left: '-=' + that.$pagination.width()
+                        }, this.o.speed);
+                    }
+                } else {
+                    if (this.$pageChild.eq(this.curIndex).offset().top - this.$pagination.offset().top > this.$pagination.height()) {
+                        this.$pagination.find('.' + PAGINATIONWRAPPER).animate({
+                            top: '-=' + that.$pagination.height()
+                        }, this.o.speed);
+                    }
+                }
             }
         },
 
