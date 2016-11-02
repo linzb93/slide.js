@@ -1,12 +1,11 @@
 /*
  * jQuery.slide.js V2.3
- *
  * https://github.com/linzb93/jquery.slide.js
  * @license MIT licensed
  *
  * Copyright (C) 2016 linzb93
  *
- * Date: 2016-11-13
+ * Date: 2016-11-3
  */
 
 ;(function($) {
@@ -23,17 +22,32 @@
         pagination: '',
         paginationType: 'dot',
         paginationEvent: 'click',
-        paginationFollow: 'h',
+        paginationFollow: '',
         lazyload: false,
         showWidget: false,
         beforeSlideFunc: function() {},
         afterSlideFunc: function() {}
     };
 
-    var PAGINATIONWRAPPER = 'slide-pagination-wrapper';
+    var PAGINATION_WRAPPER = 'slide-pagination-wrapper';
+    var SLIDE_ACTIVE = '.slide-active';
 
     function getInnerImg($ele) {
         return $ele.find('img').attr('src') || $ele.find('img').attr('data-src') || $ele.css('background-image').slice(5, -2);
+    }
+
+    function paginationOffsetDelta($ele1, $ele2, paginationFollow) {
+        var dir, size;
+        if (paginationFollow === 'h') {
+            dir = 'left';
+            size = $ele2.width();
+        } else {
+            dir = 'top';
+            size = $ele2.height();
+        }
+        if ($ele1.offset()[dir] - $ele2.offset()[dir] > size) {
+            $ele2.find('.' + PAGINATION_WRAPPER).css(dir, '-=' + size);
+        }
     }
 
     /*
@@ -86,6 +100,8 @@
                 this.$list.addClass('slide-' + this.o.dir);
             }
 
+            this.$li.addClass(SLIDE_ACTIVE);
+
             if (this.$pagination) {
                 this.createPagination();
             }
@@ -101,7 +117,7 @@
             this.initEvent();
             this.setAutoPlay();
             if (this.o.effect === 'marquee') {
-                this.totalHandler();
+                this.marqueeHandler();
             }
         },
 
@@ -129,11 +145,11 @@
             this.$pageChild = this.$pagination.children();
             this.$pageChild.first().addClass('on');
             if (this.o.paginationType === 'image') {
-                this.$pageChild.wrapAll('<div class="' + PAGINATIONWRAPPER + '" />');
+                this.$pageChild.wrapAll('<div class="' + PAGINATION_WRAPPER + '" />');
                 if (this.o.paginationFollow === 'h') {
-                    this.$pagination.find('.' + PAGINATIONWRAPPER).width(this.$pageChild.outerWidth(true) * this.$li.length);
-                } else {
-                    this.$pagination.find('.' + PAGINATIONWRAPPER).height(this.$pageChild.outerHeight(true) * this.$li.length);
+                    this.$pagination.find('.' + PAGINATION_WRAPPER).width(this.$pageChild.outerWidth(true) * this.$li.length);
+                } else if (this.o.paginationFollow === 'f') {
+                    this.$pagination.find('.' + PAGINATION_WRAPPER).height(this.$pageChild.outerHeight(true) * this.$li.length);
                 }
             }
         },
@@ -177,7 +193,7 @@
                         that.setAutoPlay();
                     }
                     if (that.o.effect === 'marquee') {
-                        that.marqueeHandler()
+                        that.marqueeHandler();
                     }
                     if (that.o.showWidget) {
                         that.$widget.stop(true, true).fadeOut();
@@ -207,9 +223,6 @@
                     break;
                 case 'fade':
                     this.fadeHandler(btnDir, num);
-                    break;
-                case 'marquee':
-                    this.marqueeHandler();
                     break;
             }
         },
@@ -279,8 +292,9 @@
             var that = this,
                 initPos = -this.liSize + 'px',
                 listSize = this.liSize * (this.length + 2);
-            this.$li.first().clone().appendTo(this.$list);
+            this.$li.first().removeClass(SLIDE_ACTIVE).clone().appendTo(this.$list);
             this.$li.last().clone().prependTo(this.$list);
+            this.$li.first().addClass(SLIDE_ACTIVE);
             this.o.dir === 'h' ?
                 this.$list.css({
                     left: initPos,
@@ -343,20 +357,11 @@
             if (this.$pagination) {
                 this.$pageChild.removeClass('on').eq(this.curIndex).addClass('on');
             }
+
+            this.$li.removeClass(SLIDE_ACTIVE).eq(this.curIndex).addClass(SLIDE_ACTIVE);
+
             if (this.o.paginationType === 'image' && this.o.paginationFollow) {
-                if (this.o.paginationFollow === 'h') {
-                    if (this.$pageChild.eq(this.curIndex).offset().left - this.$pagination.offset().left > this.$pagination.width()) {
-                        this.$pagination.find('.' + PAGINATIONWRAPPER).animate({
-                            left: '-=' + that.$pagination.width()
-                        }, this.o.speed);
-                    }
-                } else {
-                    if (this.$pageChild.eq(this.curIndex).offset().top - this.$pagination.offset().top > this.$pagination.height()) {
-                        this.$pagination.find('.' + PAGINATIONWRAPPER).animate({
-                            top: '-=' + that.$pagination.height()
-                        }, this.o.speed);
-                    }
-                }
+                paginationOffsetDelta(this,$pageChild.eq(this.curIndex), this.$pagination, this.o.paginationFollow);
             }
         },
 
