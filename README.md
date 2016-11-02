@@ -7,7 +7,7 @@ jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
 
 ## 功能概述
 
-可实现web端的单页滚动、多页滚动和焦点轮播的效果。
+可实现web端的单页滚动、多页滚动、焦点轮播和无缝滚动等效果。
 
 查看在线Demo请点击[这里](https://linzb93.github.io/demo/jquery.slide/)。
 
@@ -15,7 +15,7 @@ jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
 
 ## 最近更新
 
-V2.2 (2016年10月23日)
+V2.3 (2016年11月3日)
 
 
 

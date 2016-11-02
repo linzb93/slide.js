@@ -1,5 +1,4 @@
-.slide-wrapper {
-    position: relative;
+.slide-container {
     overflow: hidden;
 }
 .slide-h {
@@ -20,4 +19,8 @@
     position: absolute;
     left: 0;
     top: 0;
+}
+.slide-pagination-wrapper {
+    position: relative;
+    left: 0;
 }
