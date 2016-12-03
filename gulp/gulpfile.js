@@ -7,9 +7,10 @@ var rename = require('gulp-rename');
 
 gulp.task('do', function() {
     var cr = fs.readFileSync('src/copyright', 'utf-8');
-    return gulp.src('src/accordion.js').
-    //移除测试内容
-    pipe(replace(new RegExp('//测试开始[^//测试结束]*//测试结束', 'g'), '')).
+    return gulp.src('src/*.js').
+    //添加copyright
+    pipe(header(cr)).
+    pipe(gulp.dest('dist/')).
     //压缩
     pipe(uglify()).
     //添加copyright
@@ -18,6 +19,6 @@ gulp.task('do', function() {
         extname: '.min.js'
     })).
     pipe(gulp.dest('dist/'));
-})
+});
 
 gulp.task('default', ['do']);
