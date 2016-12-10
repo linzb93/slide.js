@@ -1,17 +1,16 @@
 /*
- * jQuery.slide.js V2.3.1
+ * jQuery.slide.js V2.3.2
  *
  * https://github.com/linzb93/jquery.slide.js
  * @license MIT licensed
  *
  * Copyright (C) 2016 linzb93
  *
- * Date: 2016-12-2
+ * Date: 2016-12-10
  */
 
 (function($) {
-    //默认参数
-    var d = {
+    var defaults = {
         dir: 'h',
         speed: 500,
         prev: '',
@@ -51,7 +50,7 @@
      */
     function Slide($this, option) {
         this.$this = $this;
-        this.o = $.extend({}, d, option);
+        this.o = $.extend({}, defaults, option);
 
         this.$btnPrev = $(this.o.prev);
         this.$btnNext = $(this.o.next);
@@ -64,7 +63,7 @@
         this.$pageChild = null; //pagination's childnode
         this.timer = null;
         this.curIndex = 0;
-        this.imgLen = 0; //已经加载图片的轮播项数量
+        this.loadImgLen = 0; //已经加载图片的轮播项数量
         this.canSlide = false;
         this.$widget = this.$btnPrev.add(this.$btnNext).add(this.$pagination);
         this.needDuplicateEdge = this.o.autoPlay || this.o.next;
@@ -303,18 +302,19 @@
             if ($curLi.attr('data-bg')) {
                 $curLi.css('background-image', $curLi.data('bg'))
                 .removeAttr('data-bg');
-            } else {
+                this.loadImgLen++;
+            } else if ($curLi.find('img').attr('data-src')) {
                 $curLi.find('img').each(function() {
                     $(this).attr('src', $(this).data('src'));
                     $(this).removeAttr('data-src');
                 });
+                this.loadImgLen++;
             }
-            this.imgLen++;
         },
 
         //执行轮播动画之前的函数
         doBeforeSlideFunc: function() {
-            if (this.o.lazyload && this.imgLen <= this.$li.length) {
+            if (this.o.lazyload && this.loadImgLen <= this.$li.length) {
                 this.lazyloadHandler(this.curIndex);
             }
             this.o.beforeSlideFunc(this.curIndex - 1, this.$li.eq(this.curIndex - 1));
@@ -377,5 +377,6 @@
     //调用插件
     $.fn.slide = function(option) {
         new Slide($(this), option);
+        return this;
     };
 }(jQuery));
