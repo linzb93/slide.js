@@ -1,7 +1,7 @@
 # 关于 jquery.slide.js
 
 ##简介
-jquery.slide.js是一个Web端基于jquery的轻量轮播插件。
+jquery.slide.js是一个Web端基于jquery的轻量轮播插件。可能会不再维护，至少2017年不做更新。
 
 
 
@@ -87,17 +87,11 @@ __由于插件没有做向下兼容，因此使用新版插件时请认真阅读
 
 
 
-## 贡献
-
-如果你有打算为jquery.slide.js贡献代码。请采用fork + pull request 方式，并在发起pr前先将master上超前的代码rebase到自己的分支上。代码规范详见[CONTRIBUTION.md](https://github.com/linzb93/slide/blob/master/doc/CONTRIBUTION.md)
-
-
-
 ## License
 
 MIT licensed
 
-Copyright (C) 2016 linzb93
+Copyright (C) 2017 linzb93
 
 
 
