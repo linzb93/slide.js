@@ -1,32 +1,22 @@
-/*
- * jQuery.slide.js V2.3.2
- *
- * https://github.com/linzb93/jquery.slide.js
- * @license MIT licensed
- *
- * Copyright (C) 2016 linzb93
- *
- * Date: 2016-12-10
- */
-
 (function($) {
     var defaults = {
         dir: 'h',
         speed: 500,
         prev: '',
         next: '',
-        effect: 'slide',
+        effect: 'fade',
         perGroup: 1,
         perSlideView: 1,
         autoPlay: 0,
+        easing: 'swing',
+        useCSS3: false,
         pagination: '',
         paginationType: 'dot',
         paginationEvent: 'click',
-        paginationFollow: '',
         lazyload: false,
         showWidget: false,
-        beforeSlideFunc: function() {},
-        afterSlideFunc: function() {}
+        beforeSlide: function() {},
+        afterSlide: function() {}
     };
 
     //特殊类名
@@ -79,8 +69,8 @@
                 this.$list.addClass('slide-pile');
                 this.$li.hide().first().show();
             } else {
-                var wrapperSize = this.liSize * this.o.perGroup,
-                    listSize = this.liSize * this.$li.length;
+                var wrapperSize = this.liSize * this.o.perGroup;
+                var listSize = this.liSize * this.$li.length;
                 this.$this.addClass('slide-container');
                 if (this.o.dir === 'h') {
                     this.$this.width(wrapperSize);
@@ -107,6 +97,7 @@
             if (this.o.effect === 'slide' && this.needDuplicateEdge) {
                 this.duplicateEdge();
             }
+
             this.initEvent();
             this.setAutoPlay();
             if (this.o.effect === 'marquee') {
@@ -284,15 +275,33 @@
             this.$li.first().removeClass(SLIDE_ACTIVE).clone().appendTo(this.$list);
             this.$li.last().clone().prependTo(this.$list);
             this.$li.first().addClass(SLIDE_ACTIVE);
-            this.o.dir === 'h' ?
+            if (this.o.dir === 'h') {
+                this.$list.css('width', listSize);
+                if (this.o.useCSS3) {
+                    this.$list.css({
+                        'transform': 'translateX(' + initPos + ')',
+                        '-webkit-transform': 'translateX(' + initPos + ')'
+                    });
+                } else {
+                    this.$list.css('left', initPos);
+                }
+            } else {
+                this.$list.css('height', listSize);
+                if (this.o.useCSS3) {
+                    this.$list.css({
+                        'transform': 'translateY(' + initPos + 'px)',
+                        '-webkit-transform': 'translateY(' + initPos + 'px)'
+                    });
+                } else {
+                    this.$list.css('top', initPos);
+                }
+            }
+            if (this.o.useCSS3) {
                 this.$list.css({
-                    left: initPos,
-                    width: listSize
-                }) :
-                this.$list.css({
-                    top: initPos,
-                    height: listSize
-                });
+                    'transition': 'transform '+ that.o.speed / 1000 + 's',
+                    '-webkit-transition': '-webkit-transform '+ that.o.speed / 1000 + 's'
+                })
+            }
         },
 
         //处理单页滚动和焦点轮播的懒加载
@@ -313,33 +322,53 @@
         },
 
         //执行轮播动画之前的函数
-        doBeforeSlideFunc: function() {
+        dobeforeSlide: function() {
             if (this.o.lazyload && this.loadImgLen <= this.$li.length) {
                 this.lazyloadHandler(this.curIndex);
             }
-            this.o.beforeSlideFunc(this.curIndex - 1, this.$li.eq(this.curIndex - 1));
+            this.o.beforeSlide(this.curIndex - 1, this.$li.eq(this.curIndex - 1));
         },
 
         //执行滚动动画
         slidePage: function(num) {
-            this.doBeforeSlideFunc(num);
+            this.dobeforeSlide(num);
             var that = this;
             var newNum = (this.o.effect === 'slide' && this.needDuplicateEdge) ? num + 1 : num;
             var targetPos = -newNum * this.liSize * this.o.perSlideView;
             if (this.o.dir === 'h') {
-               this.$list.stop(true).animate({left: targetPos}, this.o.speed, 'linear', function() {
-                    that.slideCallBack(num);
-                });
+                if (this.o.useCSS3) {
+                    this.$list.css({
+                        'transform': 'translateX(' + targetPos + 'px)',
+                        '-webkit-transform': 'translateX(' + targetPos + 'px)'
+                    })
+                    setTimeout(function() {
+                        that.slideCallBack(num);
+                    }, that.o.speed);
+                } else {
+                    this.$list.stop(true).animate({'left': targetPos}, this.o.speed, 'linear', function() {
+                        that.slideCallBack(num);
+                    });
+                }
             } else {
-                this.$list.stop(true).animate({top: targetPos}, this.o.speed, 'linear', function() {
-                    that.slideCallBack(num);
-                });
+                if (this.o.useCSS3) {
+                    this.$list.css({
+                        'transform': 'translateY(' + targetPos + ')',
+                        '-webkit-transform': 'translateY(' + targetPos + ')'
+                    })
+                    setTimeout(function() {
+                        that.slideCallBack(num);
+                    }, that.o.speed);
+                } else {
+                    this.$list.stop(true).animate({'top': targetPos}, this.o.speed, 'linear', function() {
+                        that.slideCallBack(num);
+                    });
+                }
             }
         },
 
         //执行焦点轮播动画
         slideFade: function(num) {
-            this.doBeforeSlideFunc();
+            this.dobeforeSlide();
             var that = this;
             this.$li.eq(num).fadeIn(this.o.speed, function() {
                 that.slideCallBack(num);
@@ -370,7 +399,7 @@
                 this.curIndex = num;
             }
             this.currentClassChange(this.curIndex);
-            this.o.afterSlideFunc(this.curIndex, this.$li.eq(this.curIndex));
+            this.o.afterSlide(this.curIndex, this.$li.eq(this.curIndex));
         }
     };
 
