@@ -1,21 +1,15 @@
-# 关于 jquery.slide.js
+# slide.js
 
 ##简介
-jquery.slide.js是一个Web端基于jquery的轻量轮播插件。可能会不再维护，至少2017年不做更新。
+slide.js是一个Web端基于jquery的轻量轮播插件，可实现web端的单页滚动、多页滚动、焦点轮播和无缝滚动等效果。
 
-
-
-## 功能概述
-
-可实现web端的单页滚动、多页滚动、焦点轮播和无缝滚动等效果。
-
-查看在线Demo请点击[这里](https://linzb93.github.io/demo/jquery.slide/)。
+Demo:https://linzb93.github.io/demo/jquery.slide/
 
 
 
 ## 最近更新
 
-V2.3.2 (2016年12月10日)
+V3.0 (2016年12月10日)
 
 
 
@@ -60,30 +54,70 @@ V2.3.2 (2016年12月10日)
 </div>
 ```
 
-###配置参数调用方法
+###JavaScript
 ```javascript
-
-$('.slide-wrapper').slide({
+//配置参数
+var mySlide = $('.slide').slide({
 	speed: 500,
 	prev: '.prev',
 	next: '.next',
   	autoplay: 3000,
 	pagination: '.page'
 });
+
+//使用轮播的方法
+$('.btn').on('click', function() {
+  mySlide.stop();
+});
 ```
 
 
-## 文档
 
-### API
+## API
 
-[API.md](https://github.com/linzb93/slide/blob/master/doc/API.md)
+### 配置参数
 
-### 更新日志
+| 参数               | 类型              | 默认值              | 含义                    | 备注                                       |
+| ---------------- | --------------- | ---------------- | --------------------- | ---------------------------------------- |
+| wrapper          | String          | '.slide-wrapper' | 轮播列表的父元素              | selector                                 |
+| dir              | String          | 'h'              | 滚动方向                  | ‘h’: 水平方向；'v':竖直方向                       |
+| speed            | Number          | 500              | 滚动速度                  | 单位ms                                     |
+| prev             | String          | ''               | 前翻页按钮                 | selector                                 |
+| next             | String          | ''               | 后翻页按钮                 | selector                                 |
+| effect           | String          | 'fade'           | 轮播模式                  | 'fade': 焦点；'slide': 单页；'carousel':多页； 'marquee':无缝；'return': 来回滚动 |
+| perGroup         | Number          | 1                | 显示数量                  |                                          |
+| slidePerView     | Number          | 1                | 每次滚动的数量               |                                          |
+| autoPlay         | Number          | 0                | 轮播时间间隔                | 大于0时有效，建议大于speed值。                       |
+| pagination       | String / Object | 往下看              | 分页器                   | 值为String类型时，表示收到的是selector。              |
+| selector         | String          | ''               | 分页器的选择器               | pagination的对象属性开始                        |
+| type             | String          | 'dot'            | 分页器的类型                | ‘dot’: 点；‘num’:数字；'image': 图片；'progress':进度条；'outer': 页面上已有元素 |
+| event            | String          | 'click'          | 分页器切换事件               | 'click':点击；'mouseover/mousemove/hover/mouseenter':悬浮；‘’:无事件绑定。pagination的对象属性结束 |
+| lazyload         | Boolean         | false            | 图片懒加载                 | 值为false表示不使用懒加载。如果图片地址在img标签里，请用data-src存放地址；如果是作为background,请用data-bg存放地址。 |
+| enableShowWidget | Boolean         | false            | 鼠标悬停在轮播上方显示控件，移出时隐藏控件 |                                          |
+| css3             | Boolean         | false            | 是否使用css3动画执行轮播        | 默认不使用                                    |
+| easing           | String          | 'swing'          | 轮播速度曲线                | 如果需要改动这个参数建议引入jquery.easing.js           |
+| beforeCreate     | function        | $.noop           | 创建轮播前执行的函数            |                                          |
+| afterCreate      | function        | $.noop           | 创建轮播后执行的函数            |                                          |
+| beforeSlide      | function        | $.noop           | 执行轮播前触发的函数            | 支持传入参数，第一个参数表示当前轮播页的index，第二个参数表示当前轮播页。  |
+| afterSlide       | function        | $.noop           | 执行轮播后触发的函数            | 同上。                                      |
+
+### 方法
+
+| 名称          | 功能                            |
+| ----------- | ----------------------------- |
+| stop        | 暂停轮播                          |
+| play        | 继续轮播                          |
+| destroy     | 销毁轮播（包括移除绑定事件）                |
+| rebuild     | 重置轮播                          |
+| slidePrev   | 向前滚动                          |
+| slideNext   | 向后滚动                          |
+| set(object) | 改变配置参数。eg: set({speed: 1000}) |
+
+
+
+## 更新日志
 
 [CHANGELOG.md](https://github.com/linzb93/slide/blob/master/doc/CHANGELOG.md)
-
-__由于插件没有做向下兼容，因此使用新版插件时请认真阅读更新日志。__
 
 
 
@@ -92,9 +126,3 @@ __由于插件没有做向下兼容，因此使用新版插件时请认真阅读
 MIT licensed
 
 Copyright (C) 2017 linzb93
-
-
-
-##其他
-
-想了解开发进度，请关注Trello：https://trello.com/b/2FhJxWw0/jquery-slide-js。
