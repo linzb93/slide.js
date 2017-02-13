@@ -95,23 +95,24 @@ $('.btn').on('click', function() {
 | lazyload         | Boolean         | false            | 图片懒加载                 | 值为false表示不使用懒加载。如果图片地址在img标签里，请用data-src存放地址；如果是作为background,请用data-bg存放地址。 |
 | enableShowWidget | Boolean         | false            | 鼠标悬停在轮播上方显示控件，移出时隐藏控件 |                                          |
 | css3             | Boolean         | false            | 是否使用css3动画执行轮播        | 默认不使用                                    |
-| easing           | String          | 'swing'          | 轮播速度曲线                | 如果需要改动这个参数建议引入jquery.easing.js           |
+| easing           | String          | 'swing'          | 轮播速度曲线                | 如果需要改动这个参数建议引入jquery.easing.js。如果你想使用无缝滚动效果，easing的值建议设置成'linear'。 |
 | beforeCreate     | function        | $.noop           | 创建轮播前执行的函数            |                                          |
-| afterCreate      | function        | $.noop           | 创建轮播后执行的函数            |                                          |
+| created          | function        | $.noop           | 创建轮播后执行的函数            |                                          |
 | beforeSlide      | function        | $.noop           | 执行轮播前触发的函数            | 支持传入参数，第一个参数表示当前轮播页的index，第二个参数表示当前轮播页。  |
-| afterSlide       | function        | $.noop           | 执行轮播后触发的函数            | 同上。                                      |
+| slided           | function        | $.noop           | 执行轮播后触发的函数            | 同上。                                      |
 
 ### 方法
 
-| 名称          | 功能                            |
-| ----------- | ----------------------------- |
-| stop        | 暂停轮播                          |
-| play        | 继续轮播                          |
-| destroy     | 销毁轮播（包括移除绑定事件）                |
-| rebuild     | 重置轮播                          |
-| slidePrev   | 向前滚动                          |
-| slideNext   | 向后滚动                          |
-| set(object) | 改变配置参数。eg: set({speed: 1000}) |
+| 名称                | 功能                            |
+| ----------------- | ----------------------------- |
+| stop              | 暂停轮播                          |
+| play              | 继续轮播                          |
+| destroy           | 销毁轮播（包括移除绑定事件）                |
+| rebuild           | 重置轮播                          |
+| slidePrev         | 向前滚动                          |
+| slideNext         | 向后滚动                          |
+| slideTo(number)   | 滚动到指定位置                       |
+| setOption(object) | 改变配置参数。eg: set({speed: 1000}) |
 
 
 
