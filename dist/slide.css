@@ -1,0 +1,27 @@
+.slide-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+.slide-h {
+    position: relative;
+    left: 0;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+}
+.slide-h li {
+    float: left;
+}
+.slide-v {
+    position: relative;
+    top: 0;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+}
+.slide-pile {
+    position: relative;
+}
+.slide-pile li {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
