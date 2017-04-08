@@ -19,9 +19,9 @@ V3.0 (2017年04月08日)
 
 
 
-##使用方法
+## 使用方法
 
-###引入文件
+### 引入文件
 
 - jQuery.js(1.8.0+)
 - slide.css
@@ -34,7 +34,7 @@ V3.0 (2017年04月08日)
 <script src="slide.js"></script>
 ```
 
-###HTML结构
+### HTML结构
 ```html
 <div class="slide">
 	<div class="slide-wrapper">
@@ -54,7 +54,7 @@ V3.0 (2017年04月08日)
 </div>
 ```
 
-###JavaScript
+### JavaScript
 ```javascript
 //配置参数
 var mySlide = $('.slide').slide({
