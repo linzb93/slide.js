@@ -2,7 +2,6 @@ var gulp = require('gulp');
 var fs = require('fs');
 var uglify = require('gulp-uglify');
 var header = require('gulp-header');
-var replace = require('gulp-replace');
 var rename = require('gulp-rename');
 
 gulp.task('do', function() {

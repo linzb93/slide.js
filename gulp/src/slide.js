@@ -1,14 +1,3 @@
-/*
- * slide.js V3.0
- *
- * https://github.com/linzb93/slide.js
- * @license MIT licensed
- *
- * Copyright (C) 2017 linzb93
- *
- * Date: 2017-04-08
- */
-
 (function($) {
     'use strict';
 
