@@ -1,6 +1,6 @@
-.slide-wrapper {
-    position: relative;
+.slide-container {
     overflow: hidden;
+    position: relative;
 }
 .slide-h {
     position: relative;
